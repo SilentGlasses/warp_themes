@@ -4,7 +4,7 @@ This is a set of themes for Warp Terminal.
 
 If you want to get Warp, download it from [here](https://app.warp.dev/referral/2K4GVJ)
 
-**IMPORTANT**: Screenshots will be added shortly.
+These use the installer base from [Warp-Themes](https://warp-themes.com/)
 
 ## Installation
 
