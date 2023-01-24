@@ -17,3 +17,10 @@ To install the themes is simple:
 * Select the newly installed theme
 * Click the `✓` button at the bottom
 * Enjoy your new theme
+
+
+## Retro Green
+
+```
+curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/retro_green.sh' | bash
+```
