@@ -25,11 +25,15 @@ To install the themes is simple:
 curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/kali_blue.sh' | bash
 ```
 
+![kali_blue](./images/kali_blue.png)
+
 ## Material Dark
 
 ```
 curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/material_dark.sh' | bash
 ```
+
+![material_dark](./images/material_dark.png)
 
 ## Matrix Dark
 
@@ -37,11 +41,15 @@ curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mat
 curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/matrix_dark.sh' | bash
 ```
 
+![matrix_dark](./images/matrix_dark.png)
+
 ## Nord Dark
 
 ```
 curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/nord_dark.sh' | bash
 ```
+
+![nord_dark](./images/nord_dark.png)
 
 ## Nord Light
 
@@ -49,14 +57,20 @@ curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/nor
 curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/nord_light.sh' | bash
 ```
 
+![nord_light](./images/nord_light.png)
+
 ## Proton Dark
 
 ```
 curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/proton_dark.sh' | bash
 ```
 
+![proton_dark](./images/proton_dark.png)
+
 ## Retro Green
 
 ```
 curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/retro_green.sh' | bash
 ```
+
+![retro_green](./images/retro_green.png)
