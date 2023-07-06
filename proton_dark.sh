@@ -24,8 +24,6 @@ background: "#1b1340"
 foreground: "#f5f4f2"
 accent: "#6d4aff"
 details: "darker"
-
-magenta: "#b48ead"
 '
 # Warp Variables
 readonly WARP_THEME_DIR="$HOME/.warp/themes"
