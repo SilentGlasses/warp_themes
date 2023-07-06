@@ -1,28 +1,29 @@
 #!/bin/bash
 # Theme Configuration
 readonly THEME_NAME="Material_Dark"
-readonly THEME_CONTENT='foreground: "#fafefe"
-accent: "#fafefe"
-background: "#222c32"
+readonly THEME_CONTENT='
 terminal_colors:
   bright:
-    red: "#fd8075"
     black: "#49646f"
+    red: "#fd8075"
+    green: "#b0f6c3"
+    yellow: "#fbdf74"
+    blue: "#74d3f7"
+    magenta: "#fc73a1"
     cyan: "#9bfce4"
     white: "#fafefe"
-    yellow: "#fbdf74"
-    magenta: "#fc73a1"
-    green: "#b0f6c3"
-    blue: "#74d3f7"
   normal:
-    green: "#b0f6c3"
-    blue: "#74d3f7"
-    red: "#fd8075"
-    cyan: "#9bfce4"
-    magenta: "#fc73a1"
-    white: "#fafefe"
-    yellow: "#fbdf74"
     black: "#49646f"
+    red: "#fd8075"
+    green: "#b0f6c3"
+    yellow: "#fbdf74"
+    blue: "#74d3f7"
+    magenta: "#fc73a1"
+    cyan: "#9bfce4"
+    white: "#fafefe"
+background: "#222c32"
+foreground: "#fafefe"
+accent: "#fafefe"
 details: "darker"
 '
 # Warp Variables
@@ -48,11 +49,11 @@ if [ -f "${WARP_THEME_DIR}/${THEME_NAME}.yaml" ]; then
 	printf "${RED_BOLD}âœ—${RESET} ${BOLD}Theme already exists:${RESET} ${DIM}${WARP_THEME_DIR}/${THEME_NAME}.yaml\n\n"
 	printf "${BLACK}${BACKGROUND_LIGHT_RED} Next steps ${RESET}\n\n"
 	printf "Delete the file to continue\n"
-	printf "Copy and paste ${DIM}rm ${WARP_THEME_DIR}/${THEME_NAME}.yaml ${RESET}into your terminal\n" 
+	printf "Copy and paste ${DIM}rm ${WARP_THEME_DIR}/${THEME_NAME}.yaml ${RESET}into your terminal\n"
 	exit 1
 fi
 touch "${WARP_THEME_DIR}/${THEME_NAME}.yaml"
-echo "${THEME_CONTENT}" > "${WARP_THEME_DIR}/${THEME_NAME}.yaml"	
+echo "${THEME_CONTENT}" > "${WARP_THEME_DIR}/${THEME_NAME}.yaml"
 printf "${GREEN_BOLD}âœ”${RESET} ${GREEN}Successfully installed the theme!\n\n"
 printf "${BLACK}${BACKGROUND_LIGHT_GREEN} Next steps ${RESET}\n\n"
 printf "Restart Warp and select ${GREEN_BOLD}${THEME_NAME} ${RESET}from the Theme Picker\n\n"
