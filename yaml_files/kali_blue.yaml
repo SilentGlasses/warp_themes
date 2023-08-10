@@ -1,8 +1,8 @@
 # Kali Blue Warp Theme
 accent: "#b4faff"
-background: "#151c24
+background: "#151c24"
 details: "darker"
-foreground: "#92d3d8
+foreground: "#92d3d8"
 terminal_colors:
   bright:
     black: "#010305"
