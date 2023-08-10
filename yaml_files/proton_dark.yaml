@@ -1,0 +1,24 @@
+# Proton Dark Warp Theme
+accent: "#6d4aff"
+background: "#1b1340"
+details: "darker"
+foreground: "#f5f4f2"
+terminal_colors:
+  bright:
+    black: "#1b1340"
+    red: "#eb508d"
+    green: "#66deb1"
+    yellow: "#f9d949"
+    blue: "#50b0e9"
+    magenta: "#6d4af6"
+    cyan: "#c4b7ff"
+    white: "#f5f4f2"
+  normal:
+    black: "#1b1340"
+    red: "#eb508d"
+    green: "#66deb1"
+    yellow: "#f9d949"
+    blue: "#50b0e9"
+    magenta: "#6d4af6"
+    cyan: "#c4b7ff"
+    white: "#f5f4f2"
