@@ -1,0 +1,24 @@
+# Kali Blue Warp Theme
+accent: "#b4faff"
+background: "#151c24
+details: "darker"
+foreground: "#92d3d8
+terminal_colors:
+  bright:
+    black: "#010305"
+    red: "#575e61"
+    green: "#25718c"
+    yellow: "#627c85"
+    blue: "#2a859a"
+    magenta: "#2e93a9"
+    cyan: "#33a9b8"
+    white: "#92d3d8"
+  normal:
+    black: "#010305"
+    red: "#575e61"
+    green: "#25718c"
+    yellow: "#627c85"
+    blue: "#2a859a"
+    magenta: "#2e93a9"
+    cyan: "#33a9b8"
+    white: "#92d3d8"
