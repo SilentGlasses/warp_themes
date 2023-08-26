@@ -1,0 +1,25 @@
+# 117 Warp Theme
+# Author: SilentGlasses
+accent: "#976A14"
+background: "#161616"
+details: "darker"
+foreground: "#F9FCF0"
+terminal_colors:
+  bright:
+    black: "#1B121A"
+    red: "#D36043"
+    green: "#999E5E"
+    yellow: "#EDCC00"
+    blue: "#647CBA"
+    magenta: "#686286"
+    cyan: "#BAC6EC"
+    white: "#F9FCF0"
+  normal:
+    black: "#1B121A"
+    red: "#D36043"
+    green: "#999E5E"
+    yellow: "#EDCC00"
+    blue: "#647CBA"
+    magenta: "#686286"
+    cyan: "#BAC6EC"
+    white: "#F9FCF0"
