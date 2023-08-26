@@ -17,7 +17,7 @@ To install the themes is simple:
 * Enjoy your new theme
 
 
-## 117 Blue
+## 117
 
 ```
 curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/117.sh' | bash
@@ -49,7 +49,7 @@ curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mat
 
 ![matrix_dark](./images/matrix_dark.png)
 
-## mjolnir Blue
+## mjolnir
 
 ```
 curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mjolnir.sh' | bash
