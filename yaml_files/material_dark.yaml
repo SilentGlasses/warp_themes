@@ -1,0 +1,25 @@
+# Material Dark Warp Theme
+# Author: SilentGlasses
+accent: "#fafefe"
+background: "#222c32"
+details: "darker"
+foreground: "#fafefe"
+terminal_colors:
+  bright:
+    black: "#49646f"
+    red: "#fd8075"
+    green: "#b0f6c3"
+    yellow: "#fbdf74"
+    blue: "#74d3f7"
+    magenta: "#fc73a1"
+    cyan: "#9bfce4"
+    white: "#fafefe"
+  normal:
+    black: "#49646f"
+    red: "#fd8075"
+    green: "#b0f6c3"
+    yellow: "#fbdf74"
+    blue: "#74d3f7"
+    magenta: "#fc73a1"
+    cyan: "#9bfce4"
+    white: "#fafefe"
