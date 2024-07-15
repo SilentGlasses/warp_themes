@@ -45,6 +45,14 @@ cd ~/Downloads && git clone https://github.com/SilentGlasses/warp_themes.git && 
 
 **NOTE**: The install scripts only works on Mac for the time being. I am working on making them more flexible as Warp is now on Linux.
 
+### African History
+
+```
+curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_installers/african_history.sh' | bash
+```
+
+![African History](./images/african_history.png)
+
 ### 117
 
 ```
