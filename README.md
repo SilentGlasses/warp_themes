@@ -51,7 +51,7 @@ cd ~/Downloads && git clone https://github.com/SilentGlasses/warp_themes.git && 
 curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_installers/african_history.sh' | bash
 ```
 
-![African History](./images/african_history.png)
+![african_history](./images/african_history.png)
 
 ### 117
 
@@ -109,6 +109,14 @@ curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac
 
 ![nord_light](./images/nord_light.png)
 
+### Pride Dark
+
+```
+curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_installers/pride_dark.sh' | bash
+```
+
+![pride_dark](./images/pride_dark.png)
+
 ### Proton Dark
 
 ```
@@ -131,4 +139,4 @@ curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac
 curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_installers/vintage_dark.sh' | bash
 ```
 
-![retro_green](./images/vintage_dark.png)
+![vintage_dark](./images/vintage_dark.png)
