@@ -83,7 +83,7 @@ curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac
 curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_installers/mjolnir.sh' | bash
 ```
 
-![mjolnir](./images/mjolnir.png)
+![mjolnir](./images/mjolnir_dark.png)
 
 ### Nord Dark
 
@@ -116,3 +116,11 @@ curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac
 ```
 
 ![retro_green](./images/retro_green.png)
+
+## Vintage Dark
+
+```
+curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_installers/vintage_dark.sh' | bash
+```
+
+![retro_green](./images/vintage_dark.png)
