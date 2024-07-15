@@ -59,7 +59,7 @@ curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac
 curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_installers/117.sh' | bash
 ```
 
-![117](./images/117.png)
+![117](./images/117_dark.png)
 
 ### Kali Blue
 
