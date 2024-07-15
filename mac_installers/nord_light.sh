@@ -22,7 +22,7 @@ readonly THEME_CONTENT='terminal_colors:
     white: "#d8dee9"
 background: "#e5e9f0"
 foreground: "#424959"
-accent: "#e5e9f0"
+accent: "#81a1c1"
 details: "lighter"
 '
 # Warp Variables
