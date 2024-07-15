@@ -1,0 +1,25 @@
+# African History Warp Theme
+# Author: SilentGlasses
+details: "darker"
+accent: "#f9b612"
+background: "#201c1d"
+foreground: "#a78d7c"
+terminal_colors:
+  bright:
+    black: "#2b2926"
+    red: "#c35b48"
+    green: "#458962"
+    yellow: "#e5c027"
+    blue: "#125592"
+    magenta: "#4d4775"
+    cyan: "#568889"
+    white: "#FFFFFF"
+  normal:
+    black: "#2b2926"
+    red: "#c35b48"
+    green: "#458962"
+    yellow: "#e5c027"
+    blue: "#125592"
+    magenta: "#4d4775"
+    cyan: "#568889"
+    white: "#FFFFFF"
