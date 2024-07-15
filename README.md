@@ -20,20 +20,26 @@ If you want to get Warp, download it from [here](https://app.warp.dev/referral/2
 
 ### On Apple Computers
 
-- Choose the theme you want to use and run the command below the image
-- Restart Warp
-- Launch the theme picker: <kbd>ctrl</kbd> + <kbd>⌘</kbd> + <kbd>T</kbd>
-- Select the newly installed theme to enable it
-- Enjoy your new theme
+1. Choose the theme you want to use and run the command below the image
+2. Restart Warp
+3. Launch the theme picker: <kbd>ctrl</kbd> + <kbd>⌘</kbd> + <kbd>T</kbd>
+4. Select the newly installed theme to enable it
+5. Enjoy your new theme
+
+If you want to install all the themes, run the following command then perform steps 2 -5 above:
+
+```
+cd ~/Downloads && git clone https://github.com/SilentGlasses/warp_themes.git && cd warp_themes && ./macinstall.sh
+```
 
 ### On Linux Computers
 
-- Choose the theme you want to install
-- Browse to the `yaml_files` folder
-- Copy the contents of the theme you want then paste it in one of the following directories depending on which distro you use:
-  - `~/.config/warp-terminal/themes`
-  - `~/.local/share/warp-terminal/themes`  _I use Pop!\_OS and this one works for me._
-  - `~/.local/state/warp-terminal/themes`
+1. Choose the theme you want to install
+2. Browse to the `yaml_files` folder
+3. Copy the contents of the theme you want then paste it in one of the following directories depending on which distro you use:
+    - `~/.config/warp-terminal/themes`
+    - `~/.local/share/warp-terminal/themes`  _(I use Pop!\_OS and this one works for me.)_
+    - `~/.local/state/warp-terminal/themes`
 
 ## Available Themes
 
