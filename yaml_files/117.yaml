@@ -1,8 +1,9 @@
 # 117 Warp Theme
 # Author: SilentGlasses
+name: 117
+details: "darker"
 accent: "#976A14"
 background: "#161616"
-details: "darker"
 foreground: "#F9FCF0"
 terminal_colors:
   bright:
