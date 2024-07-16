@@ -1,0 +1,26 @@
+# Spring Light Warp Theme
+# Author: SilentGlasses
+name: Spring Light
+details: "darker"
+accent: "#575050"
+background: "#ffffff"
+foreground: "#34495E"
+terminal_colors:
+  bright:
+    black: "#707070"
+    red: "#F08080"
+    green: "#82E0AA"
+    yellow: "#F4D03F"
+    blue: "#85C1E9"
+    magenta: "#BA55D3"
+    cyan: "#AFEEEE"
+    white: "#D2D7D3"
+  normal:
+    black: "#707070"
+    red: "#F08080"
+    green: "#82E0AA"
+    yellow: "#F4D03F"
+    blue: "#85C1E9"
+    magenta: "#BA55D3"
+    cyan: "#AFEEEE"
+    white: "#D2D7D3"
