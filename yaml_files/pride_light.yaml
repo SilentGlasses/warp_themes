@@ -1,0 +1,25 @@
+# Pride Light Warp Theme
+# Author: SilentGlasses
+accent: "#ff4583"
+background: "#fff5f5"
+foreground: "#6f3b6c"
+details: "darker"
+terminal_colors:
+  bright:
+    black: "#593624"
+    red: "#ff4b4b"
+    green: "#1cdb55"
+    yellow: "#d8ce05"
+    blue: "#8080fc"
+    magenta: "#e673e6"
+    cyan: "#88ffff"
+    white: "#ffffff"
+  normal:
+    black: "#352116"
+    red: "#f34343"
+    green: "#17c34b"
+    yellow: "#bcb400"
+    blue: "#6767ff"
+    magenta: "#d363d3"
+    cyan: "#76eded"
+    white: "#fffbfb"
