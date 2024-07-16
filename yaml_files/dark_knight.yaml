@@ -1,0 +1,25 @@
+# Dark Knight Warp Theme
+# Author: SilentGlasses
+accent: "#d26937"
+background: "#0c1014"
+details: "darker"
+foreground: "#99d1ce"
+terminal_colors:
+  bright:
+    black: "#091f2e"
+    red: "#c23127"
+    green: "#2aa889"
+    yellow: "#edb443"
+    blue: "#1e6479"
+    magenta: "#888ca6"
+    cyan: "#33859E"
+    white: "#d3ebe9"
+  normal:
+    black: "#091f2e"
+    red: "#c23127"
+    green: "#2aa889"
+    yellow: "#edb443"
+    blue: "#1e6479"
+    magenta: "#888ca6"
+    cyan: "#33859E"
+    white: "#d3ebe9"

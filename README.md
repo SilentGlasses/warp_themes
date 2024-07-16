@@ -61,6 +61,14 @@ curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac
 
 ![117](./images/117_dark.png)
 
+### Dark Knight
+
+```
+curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_installers/dark_knight.sh' | bash
+```
+
+![dark_knight](./images/dark_knight.png)
+
 ### Kali Blue
 
 ```
@@ -117,6 +125,14 @@ curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac
 
 ![pride_dark](./images/pride_dark.png)
 
+### Pride Light
+
+```
+curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_installers/pride_light.sh' | bash
+```
+
+![pride_light](./images/pride_light.png)
+
 ### Proton Dark
 
 ```
@@ -132,6 +148,14 @@ curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac
 ```
 
 ![retro_green](./images/retro_green.png)
+
+### Sad Bat
+
+```
+curl -s -N 'https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_installers/sad_bat.sh' | bash
+```
+
+![sad_bat](./images/sad_bat.png)
 
 ## Vintage Dark
 
