@@ -1,8 +1,7 @@
 #!/bin/bash
 # Theme Configuration
 readonly THEME_NAME="Material_Dark"
-readonly THEME_CONTENT='
-terminal_colors:
+readonly THEME_CONTENT='terminal_colors:
   bright:
     black: "#49646f"
     red: "#fd8075"
