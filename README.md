@@ -27,6 +27,16 @@ cd ~/Downloads && git clone https://github.com/SilentGlasses/warp_themes.git && 
 4. Select the newly installed theme to enable it
 5. Enjoy your new theme
 
+### For Windows
+
+- Clone the repo then place themes in `C:\Users\<your_username>\AppData\Roaming\warp\Warp\data\themes`. To get started, in Powershell:
+```
+New-Item -ItemType Directory -Path "$env:AppData\warp\Warp\data" -Force
+cd $env:AppData\warp\Warp\data
+New-Item -ItemType Directory -Path themes -Force
+```
+- Copy over the theme or themes `*.yaml` files you want into that directory.
+
 ## Warp Theme Installer
 
 The new Warp Theme Installer provides an interactive and user-friendly way to manage your Warp terminal themes. This robust installation script includes:
