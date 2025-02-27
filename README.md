@@ -16,7 +16,7 @@
 
 If you want to get Warp, download it from [here](https://app.warp.dev/referral/2K4GVJ)
 
-## Installation
+## Installation on Mac or Linux
 
 1. Run this command to clone the repo and initiate the installer, choose the theme you want to use or install them all:
 ```
@@ -29,13 +29,20 @@ cd ~/Downloads && git clone https://github.com/SilentGlasses/warp_themes.git && 
 
 ### For Windows
 
-- Clone the repo then place themes in `C:\Users\<your_username>\AppData\Roaming\warp\Warp\data\themes`. To get started, in Powershell:
+- Ensure PowerShell Allows Script Execution, open PowerShell as Administrator and run:
 ```
-New-Item -ItemType Directory -Path "$env:AppData\warp\Warp\data" -Force
-cd $env:AppData\warp\Warp\data
-New-Item -ItemType Directory -Path themes -Force
+Set-ExecutionPolicy Bypass -Scope Process -Force
 ```
-- Copy over the theme or themes `*.yaml` files you want into that directory.
+- Run the script from PowerShell:
+```
+irm https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install_warp_themes.ps1 | iex
+```
+- Using the GUI Installer:
+    - A window will appear listing all available themes.
+    - Select one or multiple themes and click **Install Selected**.
+    - Click **Install All** to install all themes at once.
+    - If a theme is already installed, you'll be notified.
+    - Click **Exit** to close the installer.
 
 ## Warp Theme Installer
 
