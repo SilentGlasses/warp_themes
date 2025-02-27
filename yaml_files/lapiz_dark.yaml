@@ -1,0 +1,26 @@
+# Lapiz Dark
+# Author: SilentGlasses
+name: Lapiz Dark
+details: "darker"
+accent: "#008ec4"
+background: "#303030"
+foreground: "#f1f1f1"
+terminal_colors:
+  bright:
+    black: "#303030"
+    red: "#b25282"
+    green: "#7eaf8d"
+    yellow: "#eee359"
+    blue: "#6e9ecb"
+    magenta: "#615488"
+    cyan: "#7cb0c3"
+    white: "#f3f3f1"
+  normal:
+    black: "#303030"
+    red: "#b25282"
+    green: "#7eaf8d"
+    yellow: "#eee359"
+    blue: "#6e9ecb"
+    magenta: "#615488"
+    cyan: "#7cb0c3"
+    white: "#f3f3f1"
