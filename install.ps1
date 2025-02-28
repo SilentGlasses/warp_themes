@@ -33,16 +33,18 @@ $installButton.Text = "Install Selected"
 $installButton.Location = New-Object System.Drawing.Point(10, 270)
 $installButton.Add_Click({
     $selectedThemes = $listBox.SelectedItems
+    $results = @()
     foreach ($file in $selectedThemes) {
         $destinationPath = "$warpThemePath\$file"
         if (Test-Path $destinationPath) {
-            [System.Windows.Forms.MessageBox]::Show("$file is already installed.", "Info")
+            $results += "$file is already installed."
         } else {
             $fileUrl = "$repoRawUrl/$file"
             Invoke-WebRequest -Uri $fileUrl -OutFile $destinationPath
-            [System.Windows.Forms.MessageBox]::Show("$file installed successfully!\nTo use it, restart Warp and select it from settings.", "Success")
+            $results += "$file installed successfully! To use it, restart Warp and select it from settings."
         }
     }
+    [System.Windows.Forms.MessageBox]::Show(($results -join "`n"), "Installation Results")
 })
 $form.Controls.Add($installButton)
 
@@ -50,16 +52,18 @@ $installAllButton = New-Object System.Windows.Forms.Button
 $installAllButton.Text = "Install All"
 $installAllButton.Location = New-Object System.Drawing.Point(150, 270)
 $installAllButton.Add_Click({
+    $results = @()
     foreach ($file in $themeFiles) {
         $destinationPath = "$warpThemePath\$file"
         if (Test-Path $destinationPath) {
-            [System.Windows.Forms.MessageBox]::Show("$file is already installed.", "Info")
+            $results += "$file is already installed."
         } else {
             $fileUrl = "$repoRawUrl/$file"
             Invoke-WebRequest -Uri $fileUrl -OutFile $destinationPath
-            [System.Windows.Forms.MessageBox]::Show("$file installed successfully!\nTo use it, restart Warp and select it from settings.", "Success")
+            $results += "$file installed successfully! To use it, restart Warp and select it from settings."
         }
     }
+    [System.Windows.Forms.MessageBox]::Show(($results -join "`n"), "Installation Results")
 })
 $form.Controls.Add($installAllButton)
 
