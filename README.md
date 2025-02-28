@@ -43,7 +43,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 ```
 - Run the script from PowerShell:
 ```
-irm https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install_warp_themes.ps1 | iex
+irm https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install.ps1 | iex
 ```
 
 ## Using Installed Themes
