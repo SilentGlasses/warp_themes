@@ -1,7 +1,7 @@
 # Define variables
 $repoRawUrl = "https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/yaml_files"  # Updated repo URL
 $repoApiUrl = "https://api.github.com/repos/SilentGlasses/warp_themes/contents/yaml_files"  # Updated GitHub API URL for listing files
-$warpThemePath = "$env:AppData\Roaming\warp\Warp\data\themes"
+$warpThemePath = "$env:AppData\warp\Warp\data\themes"
 
 # Ensure the destination directory exists
 if (-not (Test-Path $warpThemePath)) {
@@ -14,24 +14,25 @@ Write-Host "Fetching list of theme files..."
 $themeFilesResponse = Invoke-RestMethod -Uri $repoApiUrl
 $themeFiles = $themeFilesResponse | Where-Object { $_.name -match "\.yaml$" } | ForEach-Object { $_.name }
 
-# Create modern GUI for theme selection
+# Create GUI for theme selection
 Add-Type -AssemblyName System.Windows.Forms
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "Warp Theme Installer"
 $form.Size = New-Object System.Drawing.Size(400, 400)
 $form.StartPosition = "CenterScreen"
 
-$checkedListBox = New-Object System.Windows.Forms.CheckedListBox
-$checkedListBox.Location = New-Object System.Drawing.Point(10, 10)
-$checkedListBox.Size = New-Object System.Drawing.Size(360, 250)
-$themeFiles | ForEach-Object { $checkedListBox.Items.Add($_) }
-$form.Controls.Add($checkedListBox)
+$listBox = New-Object System.Windows.Forms.ListBox
+$listBox.Location = New-Object System.Drawing.Point(10, 10)
+$listBox.Size = New-Object System.Drawing.Size(360, 250)
+$listBox.SelectionMode = "MultiExtended"
+$themeFiles | ForEach-Object { $listBox.Items.Add($_) }
+$form.Controls.Add($listBox)
 
 $installButton = New-Object System.Windows.Forms.Button
 $installButton.Text = "Install Selected"
 $installButton.Location = New-Object System.Drawing.Point(10, 270)
 $installButton.Add_Click({
-    $selectedThemes = $checkedListBox.CheckedItems
+    $selectedThemes = $listBox.SelectedItems
     $results = @()
     foreach ($file in $selectedThemes) {
         $destinationPath = "$warpThemePath\$file"
@@ -40,11 +41,10 @@ $installButton.Add_Click({
         } else {
             $fileUrl = "$repoRawUrl/$file"
             Invoke-WebRequest -Uri $fileUrl -OutFile $destinationPath
-            $results += "$file installed successfully!"
+            $results += "$file installed successfully! To use it, restart Warp and select it from settings."
         }
     }
-    $resultsMessage = "Installation Results:`n`n" + ($results -join "`n") + "`n`nTo use the new themes, restart Warp and select them from the settings."
-    [System.Windows.Forms.MessageBox]::Show($resultsMessage, "Installation Results")
+    [System.Windows.Forms.MessageBox]::Show(($results -join "`n"), "Installation Results")
 })
 $form.Controls.Add($installButton)
 
@@ -60,11 +60,10 @@ $installAllButton.Add_Click({
         } else {
             $fileUrl = "$repoRawUrl/$file"
             Invoke-WebRequest -Uri $fileUrl -OutFile $destinationPath
-            $results += "$file installed successfully!"
+            $results += "$file installed successfully! To use it, restart Warp and select it from settings."
         }
     }
-    $resultsMessage = "Installation Results:`n`n" + ($results -join "`n") + "`n`nTo use the new themes, restart Warp and select them from the settings."
-    [System.Windows.Forms.MessageBox]::Show($resultsMessage, "Installation Results")
+    [System.Windows.Forms.MessageBox]::Show(($results -join "`n"), "Installation Results")
 })
 $form.Controls.Add($installAllButton)
 
