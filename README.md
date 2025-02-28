@@ -16,16 +16,24 @@
 
 If you want to get Warp, download it from [here](https://app.warp.dev/referral/2K4GVJ)
 
-## Installation on Mac or Linux
+This project includes easy-to-use scripts, `install.sh` for macOS and Linux and `install.ps1` for Windows, that automates the installation of Warp themes from this repository. The script fetches available theme files directly from the repository and installs them to the correct location on your system based on your operating system.
 
-1. Run this command to clone the repo and initiate the installer, choose the theme you want to use or install them all:
+## Features:
+
+- **Automatic OS Detection**: The script detects whether you're using macOS or Linux and installs the themes in the appropriate directory.
+- **Fetches Available Themes**: It pulls the list of themes directly from the repository, and updates the list as new themes are added.
+- **Interactive Menu**: A clean, interactive menu displays all available themes, allowing you to select themes by number or install all themes at once.
+- **Installation Summary**: After installation, it provides a summary of installed themes, already existing themes, and failed installations.
+- **Pretty Display**: The menu is formatted for clarity, making the installation process easy to follow.
+
+## Installation
+
+### For Mac or Linux
+
+- Run this command to initiate the installer, choose the theme you want to use or install them all:
 ```
-cd ~/Downloads && git clone https://github.com/SilentGlasses/warp_themes.git && cd warp_themes && ./install.sh
+bash <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install.sh)
 ```
-2. Restart Warp
-3. Launch the theme picker: <kbd>ctrl</kbd> + <kbd>⌘</kbd> + <kbd>T</kbd>
-4. Select the newly installed theme to enable it
-5. Enjoy your new theme
 
 ### For Windows
 
@@ -37,35 +45,14 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 ```
 irm https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install_warp_themes.ps1 | iex
 ```
-- Using the GUI Installer:
-    - A window will appear listing all available themes.
-    - Select one or multiple themes and click **Install Selected**.
-    - Click **Install All** to install all themes at once.
-    - If a theme is already installed, you'll be notified.
-    - Click **Exit** to close the installer.
 
-## Warp Theme Installer
+## Using Installed Themes
 
-The new Warp Theme Installer provides an interactive and user-friendly way to manage your Warp terminal themes. This robust installation script includes:
-
-### Key Features
-
-- 🎨 Interactive Theme Selection
-  - Install individual themes or all themes at once with a numbered menu
-  - Clean exit option included
-
-- 📊 Real-Time Progress Tracking
-  - Live installation status updates
-  - Clear success/failure indicators
-
-- 🔍 Smart Theme Management
-  - Automatic detection of existing themes
-  - Prevents duplicate installations
-
-- 📋 Detailed Installation Reports
-  - ✓ Successfully installed themes
-  - • Already existing themes
-  - ✗ Failed installations (if any)
+- Restart Warp if you have it running, or start it if not.
+- Click `Settings` → `Appearance` → `Themes`
+- Click on the `Current theme` box
+- Select the newly installed theme to enable it
+- Enjoy your new theme
 
 ## Available Themes
 

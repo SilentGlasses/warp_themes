@@ -1,178 +1,151 @@
 #!/bin/bash
 
 # Color definitions
-GREEN='\e[0;32m'
-BLUE='\e[0;34m'
-YELLOW='\e[1;33m'
-RED='\e[0;31m'
-NC='\e[0m' # No Color
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
 
-INSTALLERS_DIR="./installers"
+# GitHub repository details
+REPO_USER="SilentGlasses"
+REPO_NAME="warp_themes"
+BRANCH="main"
+RAW_BASE="https://raw.githubusercontent.com/$REPO_USER/$REPO_NAME/$BRANCH/yaml_files"
+API_URL="https://api.github.com/repos/$REPO_USER/$REPO_NAME/contents/yaml_files"
 
-# Display a progress bar with current progress
-display_progress_bar() {
-    local current=$1
-    local total=$2
-    local width=${3:-50}
-    local percentage=$((current * 100 / total))
-    local filled=$((width * current / total))
-    local empty=$((width - filled))
+# Determine OS using uname
+OS_TYPE=$(uname -s)
 
-    printf "${BLUE}Installing themes ${YELLOW}[${NC}"
-    printf "%${filled}s" | tr ' ' '='
-    printf "%${empty}s" | tr ' ' ' '
-    printf "${YELLOW}]${NC} ${GREEN}%3d%%${NC} (${BLUE}%d${NC}/${BLUE}%d${NC})\r" $percentage $current $total
-}
+# Determine OS and set theme directory accordingly
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  OS_NAME="macOS"
+  WARP_THEMES_DIR="$HOME/.warp/themes"  # macOS
+else
+  OS_NAME="Linux"
+  WARP_THEMES_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/warp-terminal/themes"  # Linux
+fi
 
-# Arrays to track installation status
-successful_installs=()
-existing_themes=()
-failed_installs=()
+# Ensure the installation directory exists
+mkdir -p "$WARP_THEMES_DIR"
 
-# Get theme display name from installer script
-get_theme_display_name() {
-    local script_path="$1"
-    local display_name
-    display_name=$(grep "^readonly THEME_NAME=" "$script_path" | cut -d'"' -f2)
-    if [ -z "$display_name" ]; then
-        # Fallback to file name if THEME_NAME is not found
-        display_name=$(basename "$script_path" .sh)
-    fi
-    echo "$display_name"
-}
+# Display detected OS
+clear
+echo -e "${BOLD}${BLUE}Detected OS:${NC} $OS_NAME"
+echo -e "${BOLD}${BLUE}Fetching available themes...${NC}"
 
-# List available themes and return them as an array
-get_themes() {
-    find "$INSTALLERS_DIR" -type f -name "*.sh" | sort | while read -r theme; do
-        basename "$theme" .sh
-    done
-}
+# Fetch the list of theme files from GitHub
+theme_files=$(curl -s "$API_URL" | grep -oP '"name": "\K[^"]+(?=\.yaml")')
 
-# Check if a theme is already installed
-theme_exists() {
-    local theme_name=$1
-    bash "$INSTALLERS_DIR/${theme_name}.sh" check >/dev/null 2>&1
-    return $?
-}
+if [[ -z "$theme_files" ]]; then
+  echo -e "${RED}Failed to retrieve theme list. Please check your internet connection or GitHub API limits.${NC}"
+  exit 1
+fi
 
-# Display menu of available themes
-display_menu() {
-    local themes=("$@")
-    echo -e "\n${BLUE}Available themes:${NC}"
-    for i in "${!themes[@]}"; do
-        local display_name=$(get_theme_display_name "${INSTALLERS_DIR}/${themes[$i]}.sh")
-        echo -e "  ${GREEN}$((i+1))${NC}) ${YELLOW}$display_name${NC}"
-    done
-    echo
-    echo -e "  ${GREEN}$((${#themes[@]}+1))${NC}) Install All"
-    echo -e "  ${RED}$((${#themes[@]}+2))${NC}) Exit"
-    echo
-}
+# Fetch theme names from their YAML content
+declare -A themes
+declare -A file_map
+index=1
 
-# Handle theme installation
+for file in $theme_files; do
+  yaml_url="$RAW_BASE/$file.yaml"
+  theme_name=$(curl -s "$yaml_url" | grep -m1 -oP '(?<=^name: ).*')
+
+  if [[ -z "$theme_name" ]]; then
+    theme_name="$file"  # Fallback to filename if name field is missing
+  fi
+
+  themes["$index"]="$theme_name"
+  file_map["$index"]="$file.yaml"
+  ((index++))
+done
+
+# Pretty display of theme menu (with corrected order)
+echo -e "\n${BOLD}${BLUE}Available Warp Themes:${NC}"
+echo -e "${YELLOW}-----------------------------------------${NC}"
+
+for i in $(seq 1 ${#themes[@]}); do
+  echo -e "${YELLOW}[${i}]${NC} ${themes[$i]}"
+done
+
+echo -e "${YELLOW}[A]${NC} Install all themes"
+echo -e "${YELLOW}[Q]${NC} Quit"
+echo -e "${YELLOW}-----------------------------------------${NC}"
+
+# Prompt the user for selection
+echo ""
+read -p "Select themes to install (e.g., 1 3 5 or A for all): " -r selection
+
+# Function to download and install a theme
 install_theme() {
-    local theme_name=$1
-    local display_name=$(get_theme_display_name "$INSTALLERS_DIR/${theme_name}.sh")
+  local theme_name=$1
+  local theme_file=$2
+  local url="$RAW_BASE/$theme_file"
+  local destination="$WARP_THEMES_DIR/$theme_file"
 
-    if theme_exists "$theme_name"; then
-        echo -e "${YELLOW}Theme${NC} ${BLUE}$display_name${NC} ${YELLOW}is already installed!${NC}"
-        existing_themes+=("$display_name")
-        return 2
-    fi
+  if [[ -f "$destination" ]]; then
+    existing_themes+=("$theme_name")
+    return 2
+  fi
 
-    bash "$INSTALLERS_DIR/${theme_name}.sh" >/dev/null 2>&1
-    if [ $? -eq 0 ]; then
-        successful_installs+=("$display_name")
-        return 0
+  echo -e "${BLUE}Installing $theme_name...${NC}"
+
+  if curl -sSfL "$url" -o "$destination"; then
+    installed_themes+=("$theme_name")
+    return 0
+  else
+    failed_themes+=("$theme_name")
+    return 1
+  fi
+}
+
+# Arrays to track installation outcomes
+installed_themes=()
+existing_themes=()
+failed_themes=()
+
+# Process the user's selection
+if [[ "$selection" =~ ^[Aa]$ ]]; then
+  # Install all themes
+  for i in "${!themes[@]}"; do
+    install_theme "${themes[$i]}" "${file_map[$i]}"
+  done
+elif [[ "$selection" =~ ^[Qq]$ ]]; then
+  echo "Installation canceled."
+  exit 0
+else
+  # Install selected themes
+  for index in $selection; do
+    if [[ -n "${themes[$index]}" ]]; then
+      install_theme "${themes[$index]}" "${file_map[$index]}"
     else
-        failed_installs+=("$display_name")
-        return 3
+      echo -e "${RED}Invalid selection: $index${NC}"
     fi
-}
+  done
+fi
 
-# Main installation logic
-main() {
-    mapfile -t themes < <(get_themes)
-    if [ ${#themes[@]} -eq 0 ]; then
-        echo -e "${RED}No themes found in $INSTALLERS_DIR${NC}"
-        exit 1
-    fi
+# Display installation summary
+echo -e "\n${BLUE}Installation Summary:${NC}"
 
-    # Check for already installed themes before starting
-    echo -e "${BLUE}Checking for installed themes...${NC}"
-    for theme in "${themes[@]}"; do
-        if theme_exists "$theme"; then
-            display_name=$(get_theme_display_name "$INSTALLERS_DIR/${theme}.sh")
-            existing_themes+=("$display_name")
-        fi
-    done
-    echo
+if [[ ${#installed_themes[@]} -gt 0 ]]; then
+  echo -e "${GREEN}✓ Installed themes:${NC}"
+  for theme in "${installed_themes[@]}"; do
+    echo "  - $theme"
+  done
+elif [[ ${#existing_themes[@]} -gt 0 ]]; then
+  echo -e "${YELLOW}• All selected themes were already installed.${NC}"
+fi
 
-    while true; do
-        display_menu "${themes[@]}"
-        read -rp "Select theme to install (1-$((${#themes[@]}+2))): " choice
+if [[ ${#failed_themes[@]} -gt 0 ]]; then
+  echo -e "${RED}✗ Failed installations:${NC}"
+  for theme in "${failed_themes[@]}"; do
+    echo "  - $theme"
+  done
+fi
 
-        # Validate input
-        if ! [[ "$choice" =~ ^[0-9]+$ ]] || [ "$choice" -lt 1 ] || [ "$choice" -gt $((${#themes[@]}+2)) ]; then
-            echo -e "${RED}Invalid selection. Please try again.${NC}"
-            continue
-        fi
+# Only show the "Themes were installed in" if new themes were actually installed
+if [[ ${#installed_themes[@]} -gt 0 ]]; then
+  echo -e "${BLUE}\nThemes were installed in:${NC} $WARP_THEMES_DIR"
+fi
 
-        # Handle exit
-        if [ "$choice" -eq $((${#themes[@]}+2)) ]; then
-            break
-        fi
-
-        # Handle install all
-        if [ "$choice" -eq $((${#themes[@]}+1)) ]; then
-            local total_themes=${#themes[@]}
-            local current=0
-            for theme in "${themes[@]}"; do
-                ((current++))
-                display_progress_bar $current $total_themes
-                install_theme "$theme"
-            done
-            echo
-            break
-        fi
-
-        # Install selected theme
-        display_progress_bar 0 1
-        install_theme "${themes[$((choice-1))]}"
-        display_progress_bar 1 1
-        echo
-    done
-
-    # Show summary of installations
-    echo
-    echo -e "${BLUE}╔════════════════════════════════════════╗${NC}"
-    echo -e "${BLUE}║             ${YELLOW}INSTALL REPORT${BLUE}             ║${NC}"
-    echo -e "${BLUE}╚════════════════════════════════════════╝${NC}"
-    echo
-    if [ ${#successful_installs[@]} -gt 0 ]; then
-        echo -e "${GREEN}Successfully installed themes:${NC}"
-        for theme in "${successful_installs[@]}"; do
-            echo -e "  ${GREEN}✓${NC} ${BLUE}$theme${NC}"
-            echo
-            echo -e  "Restart Warp and select a theme from the Theme Picker"
-            echo -e  "Don't know how to open the Theme Picker? ${GREEN_BOLD}https://docs.warp.dev/features/themes#how-to-access-it${NC}"
-        done
-        echo
-    fi
-    if [ ${#existing_themes[@]} -gt 0 ]; then
-        echo -e "${YELLOW}Already installed themes:${NC}"
-        for theme in "${existing_themes[@]}"; do
-            echo -e "  ${YELLOW}•${NC} ${BLUE}$theme${NC}"
-        done
-        echo
-    fi
-    if [ ${#failed_installs[@]} -gt 0 ]; then
-        echo -e "${RED}Failed installations:${NC}"
-        for theme in "${failed_installs[@]}"; do
-            echo -e "  ${RED}✗${NC} ${BLUE}$theme${NC}"
-        done
-        echo
-    fi
-}
-
-main
+echo -e "${BLUE}Installation process completed.${NC}"
