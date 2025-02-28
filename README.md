@@ -58,64 +58,73 @@ irm https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install_war
 
 ### African History
 
-![african_history](./images/african_history.png)
+<img src="./images/african_history.png" alt="African History" width="850">
 
 ### 117
 
-![117](./images/117_dark.png)
+<img src="./images/117_dark.png" alt="117" width="850">
 
 ### Kali Blue
 
-![kali_blue](./images/kali_blue.png)
+<img src="./images/kali_blue.png" alt="Kali Blue" width="850">
+
+### Lapiz Dark
+
+<img src="./images/lapiz_dark.png" alt="Lapiz Dark" width="850">
+
+
+### Lapiz Light
+
+<img src="./images/lapiz_light.png" alt="Lapiz Light" width="850">
 
 ### Material Dark
 
-![material_dark](./images/material_dark.png)
+<img src="./images/material_dark.png" alt="Material Dark" width="850">
 
 ### Matrix Dark
 
-![matrix_dark](./images/matrix_dark.png)
+<img src="./images/matrix_dark.png" alt="Matrix Dark" width="850">
 
-### mjolnir
+### Mjolnir
 
-![mjolnir](./images/mjolnir_dark.png)
+<img src="./images/mjolnir_dark.png" alt="Mjolnir" width="850">
 
 ### Nord Dark
 
-![nord_dark](./images/nord_dark.png)
+<img src="./images/nord_dark.png" alt="Nord Dark" width="850">
 
 ### Nord Light
 
-![nord_light](./images/nord_light.png)
+<img src="./images/nord_light.png" alt="Nord Light" width="850">
 
 ### Pride Dark
 
-![pride_dark](./images/pride_dark.png)
+<img src="./images/pride_dark.png" alt="Pride Dark" width="850">
 
 ### Pride Light
 
-![pride_light](./images/pride_light.png)
+<img src="./images/pride_light.png" alt="Pride Light" width="850">
 
 ### Proton Dark
 
-![proton_dark](./images/proton_dark.png)
+<img src="./images/proton_dark.png" alt="Proton Dark" width="850">
 
 ### Spring Dark
 
-![spring_dark](./images/spring_dark.png)
+<img src="./images/spring_dark.png" alt="Spring Dark" width="850">
 
 ### Spring Light
 
-![spring_light](./images/spring_light.png)
+<img src="./images/spring_light.png" alt="Spring Light" width="850">
 
 ### Retro Green
 
-![retro_green](./images/retro_green.png)
+<img src="./images/retro_green.png" alt="Retro Green" width="850">
 
 ### Vintage Dark
 
-![vintage_dark](./images/vintage_dark.png)
+<img src="./images/vintage_dark.png" alt="Vintage Dark" width="850">
 
 ### Webs Dark
 
-![webs_dark](./images/webs_dark.png)
+<img src="./images/webs_dark.png" alt="Webs Dark" width="850">
