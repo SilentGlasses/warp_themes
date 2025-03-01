@@ -26,6 +26,8 @@ $form.Text = "Warp Theme Installer"
 $form.Size = New-Object System.Drawing.Size(400, 400)
 $form.StartPosition = "CenterScreen"
 
+# Initialize the ListBox
+$listBox = New-Object System.Windows.Forms.ListBox
 $listBox.Location = New-Object System.Drawing.Point(10, 10)
 $listBox.Size = New-Object System.Drawing.Size(360, 250)
 $listBox.SelectionMode = "MultiExtended"
