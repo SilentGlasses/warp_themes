@@ -50,7 +50,7 @@ function Create-ThemeInstallerGUI {
                     Invoke-WebRequest -Uri $fileUrl -OutFile $destinationPath
                     [System.Windows.Forms.MessageBox]::Show("$file installed successfully!`nTo use it, restart Warp and select it from settings.", "Success")
                 } catch {
-                    [System.Windows.Forms.MessageBox]::Show("Error installing $file: $_", "Error")
+                    [System.Windows.Forms.MessageBox]::Show("Error installing $file: $($_)", "Error")
                 }
             }
         }
