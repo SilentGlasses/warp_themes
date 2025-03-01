@@ -16,13 +16,13 @@ function Get-ThemeFiles {
         $themeFilesResponse = Invoke-RestMethod -Uri $repoApiUrl
         return $themeFilesResponse | Where-Object { $_.name -match "\.yaml$" } | ForEach-Object { $_.name }
     } catch {
-        Write-Host "Error fetching theme files: $_"
+        Write-Host "Error fetching theme files: $($_)"
         exit 1
     }
 }
 
 # Create GUI for theme selection
-function Create-ThemeInstallerGUI {
+function New-ThemeInstallerGUI {
     param ($themeFiles)
     Add-Type -AssemblyName System.Windows.Forms
     $form = New-Object System.Windows.Forms.Form
@@ -43,14 +43,14 @@ function Create-ThemeInstallerGUI {
         foreach ($file in $themes) {
             $destinationPath = "$warpThemePath\$file"
             if (Test-Path $destinationPath) {
-                [System.Windows.Forms.MessageBox]::Show("$file is already installed.", "Info")
+                [System.Windows.Forms.MessageBox]::Show("${file} is already installed.", "Info")
             } else {
                 try {
                     $fileUrl = "$repoRawUrl/$file"
                     Invoke-WebRequest -Uri $fileUrl -OutFile $destinationPath
-                    [System.Windows.Forms.MessageBox]::Show("$file installed successfully!`nTo use it, restart Warp and select it from settings.", "Success")
+                    [System.Windows.Forms.MessageBox]::Show("${file} installed successfully!`nTo use it, restart Warp and select it from settings.", "Success")
                 } catch {
-                    [System.Windows.Forms.MessageBox]::Show("Error installing $file: $($_)", "Error")
+                    [System.Windows.Forms.MessageBox]::Show("Error installing ${file}: $(${($_.Exception.Message)})", "Error")
                 }
             }
         }
@@ -84,4 +84,4 @@ function Create-ThemeInstallerGUI {
 
 # Main
 $themeFiles = Get-ThemeFiles
-Create-ThemeInstallerGUI -themeFiles $themeFiles
+New-ThemeInstallerGUI -themeFiles $themeFiles
