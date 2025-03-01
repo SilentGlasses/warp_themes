@@ -1,7 +1,7 @@
 # Define variables
 $repoRawUrl = "https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/yaml_files"
 $repoApiUrl = "https://api.github.com/repos/SilentGlasses/warp_themes/contents/yaml_files"
-$warpThemePath = "$env:AppData\Roaming\warp\Warp\data\themes"
+$warpThemePath = "${env:AppData}\Roaming\warp\Warp\data\themes"
 
 # Ensure the destination directory exists
 if (-not (Test-Path $warpThemePath)) {
