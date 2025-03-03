@@ -107,6 +107,7 @@ function New-ThemeInstallerGUI {
     $checkedListBox.MultiColumn = $true
     $checkedListBox.ColumnWidth = 270
     $checkedListBox.Font = New-Object System.Drawing.Font("Segoe UI Variable", 10)
+    $checkedListBox.ItemHeight = 30
     $checkedListBox.Padding = New-Object System.Windows.Forms.Padding(10)
     $themeFiles | ForEach-Object { $checkedListBox.Items.Add($_) }
     $form.Controls.Add($checkedListBox)
