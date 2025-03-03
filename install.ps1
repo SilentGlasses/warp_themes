@@ -97,7 +97,7 @@ function New-ThemeInstallerGUI {
     $form.Size = New-Object System.Drawing.Size(600, 750)
     $form.StartPosition = "CenterScreen"
     $form.BackColor = [System.Drawing.Color]::FromArgb(243, 243, 243)
-    $form.Font = New-Object System.Drawing.Font("Segoe UI Variable", 12)
+    $form.Font = New-Object System.Drawing.Font("Segoe UI Variable", 10)
     $form.Padding = New-Object System.Windows.Forms.Padding(20)
 
     # Initialize the CheckedListBox
@@ -106,7 +106,7 @@ function New-ThemeInstallerGUI {
     $checkedListBox.CheckOnClick = $true
     $checkedListBox.MultiColumn = $true
     $checkedListBox.ColumnWidth = 270
-    $checkedListBox.Font = New-Object System.Drawing.Font("Segoe UI Variable", 12)
+    $checkedListBox.Font = New-Object System.Drawing.Font("Segoe UI Variable", 10)
     $checkedListBox.Padding = New-Object System.Windows.Forms.Padding(10)
     $themeFiles | ForEach-Object { $checkedListBox.Items.Add($_) }
     $form.Controls.Add($checkedListBox)
