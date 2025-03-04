@@ -72,10 +72,13 @@ irm https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install.ps1
 
 <img src="./images/lapiz_dark.png" alt="Lapiz Dark" width="850">
 
-
 ### Lapiz Light
 
 <img src="./images/lapiz_light.png" alt="Lapiz Light" width="850">
+
+### LLM Dark
+
+<img src="./images/llm_dark.png" alt="LLM Dark" width="850">
 
 ### Material Dark
 
@@ -124,6 +127,10 @@ irm https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install.ps1
 ### Retro Green
 
 <img src="./images/retro_green.png" alt="Retro Green" width="850">
+
+### Tabs Dark
+
+<img src="./images/tabs_dark.png" alt="Tabs Dark" width="850">
 
 ### Vintage Dark
 
