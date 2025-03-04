@@ -1,0 +1,26 @@
+# Neon Nights Warp Theme
+# Author: SilentGlasses
+name: Neon Nights
+accent: "#fc399a"
+background: "#231f20"
+details: "darker"
+foreground: "#e5e9f0"
+terminal_colors:
+  bright:
+    black: "#090909"
+    red: "#ff004d"
+    green: "#00FF0D"
+    yellow: "#f1ff00"
+    blue: "#00C8FF"
+    magenta: "#ff00fb"
+    cyan: "#00f7ff"
+    white: "#ffffff"
+  normal:
+    black: "#1C0B1D"
+    red: "#ea0014"
+    green: "#00ed04"
+    yellow: "#f2f200"
+    blue: "#00b5ec"
+    magenta: "#f400f4"
+    cyan: "#00e1f1"
+    white: "#eeeeee"
