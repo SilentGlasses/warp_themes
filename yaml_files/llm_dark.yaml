@@ -1,0 +1,26 @@
+# LLM Dark
+# Author: SilentGlasses
+name: LLM Dark
+details: "darker"
+accent: "#a27aed"
+background: "#142338"
+foreground: "#fefefe"
+terminal_colors:
+  bright:
+    black: "#000000"
+    red: "#ea5e39"
+    green: "#7f9b7b"
+    yellow: "#f4bf61"
+    blue: "#8e9af6"
+    magenta: "#ec8ff9"
+    cyan: "#b4d1fb"
+    white: "#fefefe"
+  normal:
+    black: "#000000"
+    red: "#ea5e39"
+    green: "#7f9b7b"
+    yellow: "#f4bf61"
+    blue: "#8e9af6"
+    magenta: "#ec8ff9"
+    cyan: "#b4d1fb"
+    white: "#fefefe"
