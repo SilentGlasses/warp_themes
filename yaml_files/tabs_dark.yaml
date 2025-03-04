@@ -1,0 +1,26 @@
+# Tabs Dark Warp Theme
+# Author: SilentGlasses
+name: Tabs Dark
+accent: "#00c0ff"
+background: "#2a2a2a"
+details: "darker"
+foreground: "#fefefe"
+terminal_colors:
+  bright:
+    black: "#000000"
+    red: "#cc0076"
+    green: "#10a579"
+    yellow: "#a69d10"
+    blue: "#008ec3"
+    magenta: "#5f4e80"
+    cyan: "#1aa7b4"
+    white: "#ffffff"
+  normal:
+    black: "#000000"
+    red: "#b60c70"
+    green: "#17a278"
+    yellow: "#a89a16"
+    blue: "#068abb"
+    magenta: "#58437a"
+    cyan: "#469daf"
+    white: "#fdfdfd"
