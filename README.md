@@ -89,6 +89,10 @@ irm https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install.ps1
 
 <img src="./images/mjolnir_dark.png" alt="Mjolnir" width="850">
 
+### Neon Nights
+
+<img src="./images/neon_nights.png" alt="Neon Nights" width="850">
+
 ### Nord Dark
 
 <img src="./images/nord_dark.png" alt="Nord Dark" width="850">
