@@ -1,0 +1,26 @@
+# White Rabbit Dark Warp Theme
+# Author: SilentGlasses
+name: White Rabbit Dark
+details: "darker"
+accent: "#00FF41"
+background: '#000000'
+foreground: "#8fd7b9"
+terminal_colors:
+  bright:
+    black:   '#00E64D'
+    red:     '#00FF41'
+    green:   '#33FF33'
+    yellow:  '#5CFF5C'
+    blue:    '#7FFF7F'
+    magenta: '#A3FFA3'
+    cyan:    '#CCFFCC'
+    white:   '#E6FFE6'
+  normal:
+    black:   '#001A0E'
+    red:     '#003D1A'
+    green:   '#005F0F'
+    yellow:  '#007A1F'
+    blue:    '#008F11'
+    magenta: '#00A321'
+    cyan:    '#00B733'
+    white:   '#00CC44'
