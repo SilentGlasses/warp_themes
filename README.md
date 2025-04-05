@@ -139,3 +139,8 @@ irm https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install.ps1
 ### Webs Dark
 
 <img src="./images/webs_dark.png" alt="Webs Dark" width="850">
+
+
+### White Rabbit Dark
+
+<img src="./images/whiterabbit.png" alt="White Rabbit Dark" width="850">
