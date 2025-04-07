@@ -35,7 +35,7 @@ echo -e "${BOLD}${BLUE}Detected OS:${NC} $OS_NAME"
 echo -e "${BOLD}${BLUE}Fetching available themes...${NC}"
 
 # Fetch the list of theme files from GitHub
-theme_files=$(curl -s "$API_URL" | grep -oP '"name": "\K[^"]+(?=\.yaml")')
+theme_files=$(curl -s "$API_URL" | sed -n 's/.*"name": "\([^"]*\.yaml\)".*/\1/p' | sed 's/\.yaml$//')
 
 if [[ -z "$theme_files" ]]; then
   echo -e "${RED}Failed to retrieve theme list. Please check your internet connection or GitHub API limits.${NC}"
@@ -49,7 +49,7 @@ index=1
 
 for file in $theme_files; do
   yaml_url="$RAW_BASE/$file.yaml"
-  theme_name=$(curl -s "$yaml_url" | grep -m1 -oP '(?<=^name: ).*')
+  theme_name=$(curl -s "$yaml_url" | grep "^name:" | sed 's/^name: *//')
 
   if [[ -z "$theme_name" ]]; then
     theme_name="$file"  # Fallback to filename if name field is missing
