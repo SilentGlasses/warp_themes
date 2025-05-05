@@ -6,7 +6,7 @@ accent: "#00FF9F"
 background: "#0A120F"
 foreground: "#B4EBC7"
 background_image:
-  path: 'strand.png'
+  path: 'dark_strand.png'
 terminal_colors:
   normal:
     black: "#0A120F"
