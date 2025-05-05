@@ -1,0 +1,28 @@
+# Strand Dark
+# Author: SilentGlasses
+name: Strand Dark
+details: "darker"
+accent: "#00FF9F"
+background: "#0A120F"
+foreground: "#B4EBC7"
+background_image:
+  path: 'strand.png'
+terminal_colors:
+  normal:
+    black: "#0A120F"
+    red: "#FF657A"
+    green: "#00FF9F"
+    yellow: "#EBFF1F"
+    blue: "#00C7EB"
+    magenta: "#C700EB"
+    cyan: "#00EBC7"
+    white: "#B4EBC7"
+  bright:
+    black: "#1A221F"
+    red: "#FF859A"
+    green: "#20FFAF"
+    yellow: "#EBFF3F"
+    blue: "#20D7FB"
+    magenta: "#D710FB"
+    cyan: "#20FBD7"
+    white: "#D4FBE7"
