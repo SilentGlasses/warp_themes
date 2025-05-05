@@ -144,3 +144,10 @@ irm https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install.ps1
 ### White Rabbit Dark
 
 <img src="./images/whiterabbit.png" alt="White Rabbit Dark" width="850">
+
+
+## Themes with Backgrounds
+
+### Strand Dark
+
+<img src="./images/strand_dark.png" alt="Strand Dark" width="850">
