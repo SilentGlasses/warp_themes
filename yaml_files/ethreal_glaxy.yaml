@@ -1,0 +1,28 @@
+# Ethereal Galaxy Dark
+# Author: SilentGlasses
+name: Ethereal Galaxy Dark
+details: "darker"
+accent: "#CC78FA"
+background: "#1C1C3F"
+foreground: "#DCDCE0"
+background_image:
+  path: 'ethereal_galaxy.png'
+terminal_colors:
+  normal:
+    black: "#1C1C3F"
+    red: "#BF65F0"
+    green: "#A4CC35"
+    yellow: "#FFD24A"
+    blue: "#F553BF"
+    magenta: "#F28144"
+    cyan: "#26C99E"
+    white: "#C1C1C9"
+  bright:
+    black: "#373756"
+    red: "#66BFFF"
+    green: "#26C99E"
+    yellow: "#FFD24A"
+    blue: "#F553BF"
+    magenta: "#F28144"
+    cyan: "#26C99E"
+    white: "#DCDCE0"
