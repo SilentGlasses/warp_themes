@@ -158,3 +158,8 @@ Some themes include background images that will be automatically installed by th
 ### Strand Dark
 
 <img src="./screenshots/strand_dark.png" alt="Strand Dark" width="850">
+
+
+### Ethereal Galaxy Dark
+
+<img src="./screenshots/ethereal_galaxy_dark.png" alt="Ethereal Galaxy Dark" width="850">
