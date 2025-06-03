@@ -155,10 +155,13 @@ irm https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install.ps1
 
 Some themes include background images that will be automatically installed by the script. The installer checks for the `background_image.path` field in each theme YAML file and downloads the corresponding image from the repository's backgrounds directory.
 
+### Neural Nebula Dark
+
+<img src="./screenshots/neural_nebula_dark.png" alt="Neural Nebula Dark" width="850">
+
 ### Strand Dark
 
 <img src="./screenshots/strand_dark.png" alt="Strand Dark" width="850">
-
 
 ### Ethereal Galaxy Dark
 
