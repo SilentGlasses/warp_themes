@@ -1,0 +1,28 @@
+# Neural Nebula Dark
+# Author: SilentGlasses
+name: Neural Nebula Dark
+details: "darker"
+accent: "#88C0D0"
+background: "#0F111A"
+foreground: "#ECEFF4"
+background_image:
+  path: 'neural_nebula.png'
+terminal_colors:
+  normal:
+    black:   "#2E3440"
+    red:     "#BF616A"
+    green:   "#A3BE8C"
+    yellow:  "#EBCB8B"
+    blue:    "#81A1C1"
+    magenta: "#B48EAD"
+    cyan:    "#8FBCBB"
+    white:   "#D8DEE9"
+  bright:
+    black:   "#3B4252"
+    red:     "#D08770"
+    green:   "#B1D196"
+    yellow:  "#F0D399"
+    blue:    "#88C0D0"
+    magenta: "#D6B4E1"
+    cyan:    "#93E0E5"
+    white:   "#ECEFF4"
