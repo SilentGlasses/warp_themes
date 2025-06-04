@@ -1,0 +1,26 @@
+# Taken Will Warp Theme
+# Author: SilentGlasses
+name: Taken Will
+details: "darker"
+accent: "#9d2449"
+background: "#222433"
+foreground: "#d7eff7"
+terminal_colors:
+  bright:
+    black: "#060c14"
+    red: "#303f4f"
+    green: "#55767d"
+    yellow: "#8397a0"
+    blue: "#2b4653"
+    magenta: "#48525d"
+    cyan: "#b2c8d1"
+    white: "#e7f9ff"
+  normal:
+    black: "#060c14"
+    red: "#303f4f"
+    green: "#55767d"
+    yellow: "#8397a0"
+    blue: "#2b4653"
+    magenta: "#48525d"
+    cyan: "#b2c8d1"
+    white: "#e7f9ff"
