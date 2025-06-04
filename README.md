@@ -137,6 +137,10 @@ irm https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install.ps1
 
 <img src="./screenshots/tabs_dark.png" alt="Tabs Dark" width="850">
 
+### Taken Will
+
+<img src="./screenshots/taken_will.png" alt="Taken Will" width="850">
+
 ### Vintage Dark
 
 <img src="./screenshots/vintage_dark.png" alt="Vintage Dark" width="850">
