@@ -67,7 +67,8 @@ For my specific setup I use the following:
 - Oh My Zsh
 - Powerlevel 10K
 - fastfetch
-    - my config is [here](https://github.com/SilentGlasses/fastfetch_config)
+    - [Get my config here](https://github.com/SilentGlasses/fastfetch_config)
+- [Download a Nerd Font here](https://www.nerdfonts.com/font-downloads)
 
 ## Available Themes
 
