@@ -59,6 +59,16 @@ irm https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install.ps1
 - Select the newly installed theme to enable it
 - Enjoy your new theme
 
+## My Setup
+
+For my specific setup I use the following:
+
+- Zsh
+- Oh My Zsh
+- Powerlevel 10K
+- fastfetch
+    - my config is [here](https://github.com/SilentGlasses/fastfetch_config)
+
 ## Available Themes
 
 ### African History
