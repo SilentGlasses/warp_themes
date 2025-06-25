@@ -1,0 +1,29 @@
+# Liquid Glass Light
+# Author: SilentGlasses
+name: Liquid Glass Light
+details: "lighter"
+accent: "#00c2ff"
+background: "#FFFFFF"
+foreground: "#1C1E21"
+background_image:
+  path: 'liquid_glass_light.png'
+  opacity: 70
+terminal_colors:
+  normal:
+    black:   "#000000"
+    red:     "#990100"
+    green:   "#00a600"
+    yellow:  "#999900"
+    blue:    "#0200b2"
+    magenta: "#b200b2"
+    cyan:    "#00a6b2"
+    white:   "#f4f8f0"
+  bright:
+    black:   "#666666"
+    red:     "#e60300"
+    green:   "#00d900"
+    yellow:  "#e6e500"
+    blue:    "#0600ff"
+    magenta: "#e600e6"
+    cyan:    "#00e6e6"
+    white:   "#f4f8f0"
