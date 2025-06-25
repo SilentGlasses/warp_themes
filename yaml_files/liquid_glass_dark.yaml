@@ -1,0 +1,29 @@
+# Liquid Glass Dark
+# Author: SilentGlasses
+name: Liquid Glass Dark
+details: "darker"
+accent: "#0F62FE"
+background: "#0F111A"
+foreground: "#E5E9F0"
+background_image:
+  path: 'liquid_glass_dark.png'
+  opacity: 60
+terminal_colors:
+  normal:
+    black:   "#1A1C24"
+    red:     "#FF453A"
+    green:   "#32D74B"
+    yellow:  "#FFD60A"
+    blue:    "#0A84FF"
+    magenta: "#BF5AF2"
+    cyan:    "#64D2FF"
+    white:   "#D0D3DC"
+  bright:
+    black:   "#2C2F3A"
+    red:     "#FF6B61"
+    green:   "#5CD97A"
+    yellow:  "#FFE055"
+    blue:    "#409CFF"
+    magenta: "#DDA6FF"
+    cyan:    "#8BEAFF"
+    white:   "#F5F7FA"
