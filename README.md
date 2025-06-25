@@ -18,6 +18,11 @@ If you want to get Warp, download it from [here](https://app.warp.dev/referral/2
 
 This project includes easy-to-use scripts, `install.sh` for macOS and Linux and `install.ps1` for Windows, that automates the installation of Warp themes from this repository. The script fetches available theme files directly from the repository and installs them to the correct location on your system based on your operating system.
 
+
+
+>[!NOTE]
+> **The Liquid Glass themes only works well on MacOS**
+
 ## Features:
 
 - **Automatic OS Detection**: The script detects whether you're using macOS or Linux and installs the themes in the appropriate directory.
@@ -40,7 +45,7 @@ bash <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/
 
 > [!NOTE]
 > The Windows Installer works at the moment, but it's still a work in progress, so don't expect too much.
-> Thanks for your understanding.
+> Thanks for your understanding and patience.
 
 - Ensure PowerShell Allows Script Execution, open PowerShell as Administrator and run:
 ```
@@ -76,9 +81,15 @@ Some themes include background images that will be automatically installed by th
 
 ### Liquid Glass Dark
 
+>[!NOTE]
+> **This theme only works well on MacOS**
+
 <img src="./screenshots/liquid_glass_dark.png" alt="Liquid Glass Dark" width="850">
 
 ### Liquid Glass Light
+
+>[!NOTE]
+> **This theme only works well on MacOS**
 
 <img src="./screenshots/liquid_glass_light.png" alt="Liquid Glass Light" width="850">
 
