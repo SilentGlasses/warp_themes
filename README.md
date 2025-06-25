@@ -70,7 +70,31 @@ For my specific setup I use the following:
     - [Get my config here](https://github.com/SilentGlasses/fastfetch_config)
 - [Download a Nerd Font here](https://www.nerdfonts.com/font-downloads)
 
-## Available Themes
+## Themes with backgrounds
+
+Some themes include background images that will be automatically installed by the script. The installer checks for the `background_image.path` field in each theme YAML file and downloads the corresponding image from the repository's backgrounds directory.
+
+### Liquid Glass Dark
+
+<img src="./screenshots/liquid_glass_dark.png" alt="Liquid Glass Dark" width="850">
+
+### Liquid Glass Light
+
+<img src="./screenshots/liquid_glass_light.png" alt="Liquid Glass Light" width="850">
+
+### Neural Nebula Dark
+
+<img src="./screenshots/neural_nebula_dark.png" alt="Neural Nebula Dark" width="850">
+
+### Strand Dark
+
+<img src="./screenshots/strand_dark.png" alt="Strand Dark" width="850">
+
+### Ethereal Galaxy Dark
+
+<img src="./screenshots/ethereal_galaxy_dark.png" alt="Ethereal Galaxy Dark" width="850">
+
+## Themes with no backgrounds
 
 ### African History
 
@@ -164,20 +188,3 @@ For my specific setup I use the following:
 ### White Rabbit Dark
 
 <img src="./screenshots/whiterabbit.png" alt="White Rabbit Dark" width="850">
-
-
-## Themes with Backgrounds
-
-Some themes include background images that will be automatically installed by the script. The installer checks for the `background_image.path` field in each theme YAML file and downloads the corresponding image from the repository's backgrounds directory.
-
-### Neural Nebula Dark
-
-<img src="./screenshots/neural_nebula_dark.png" alt="Neural Nebula Dark" width="850">
-
-### Strand Dark
-
-<img src="./screenshots/strand_dark.png" alt="Strand Dark" width="850">
-
-### Ethereal Galaxy Dark
-
-<img src="./screenshots/ethereal_galaxy_dark.png" alt="Ethereal Galaxy Dark" width="850">
