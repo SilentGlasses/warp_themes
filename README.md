@@ -34,7 +34,14 @@ This project includes easy-to-use scripts, `install.sh` for macOS and Linux and 
 
 ## Installation
 
-### For Mac or Linux
+### For Mac
+
+- Run this command to initiate the installer, choose the theme you want to use or install them all:
+```
+bash <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_installer.sh)
+```
+
+### For Linux
 
 - Run this command to initiate the installer, choose the theme you want to use or install them all:
 ```
