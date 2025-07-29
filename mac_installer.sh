@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Ensure we're running with bash
 if [[ -z "$BASH_VERSION" ]]; then
