@@ -1,14 +1,14 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 
-# Ensure we're running with bash
-if [[ -z "$BASH_VERSION" ]]; then
-    echo "Error: This script requires bash."
-    echo "Please run with: bash $0"
+# Ensure we're running with zsh
+if [[ -z "$ZSH_VERSION" ]]; then
+    echo "Error: This script requires zsh."
+    echo "Please run with: zsh $0"
     exit 1
 fi
 
-# Clear screen at the start using escape sequences for better compatibility
-printf "\033[2J\033[H"
+# Enable associative arrays in zsh
+setopt KSH_ARRAYS 2>/dev/null || true
 
 # Color definitions
 GREEN='\033[0;32m'
@@ -19,7 +19,7 @@ NC='\033[0m' # No Color
 BOLD='\033[1m'
 
 # Check for required dependencies
-if ! command -v curl &> /dev/null; then
+if ! command -v curl >/dev/null; then
     echo -e "${RED}Error: curl is required but not installed.${NC}"
     echo -e "${YELLOW}Please install curl and try again.${NC}"
     exit 1
@@ -69,13 +69,15 @@ RAW_BASE="https://raw.githubusercontent.com/$REPO_USER/$REPO_NAME/$BRANCH/yaml_f
 BACKGROUNDS_BASE="https://raw.githubusercontent.com/$REPO_USER/$REPO_NAME/$BRANCH/backgrounds"
 API_URL="https://api.github.com/repos/$REPO_USER/$REPO_NAME/contents/yaml_files"
 
-# Set theme directories for Linux
-WARP_THEMES_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/warp-terminal/themes"
-WARP_PREVIEW_THEMES_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/warp-terminal-preview/themes"
+# Set theme directories for macOS
+WARP_THEMES_DIR="$HOME/.warp/themes"
+WARP_PREVIEW_THEMES_DIR="$HOME/.warp-preview/themes"
+
+clear
 
 # Prompt for Warp version selection
-echo -e "\n${BOLD}${BLUE}WELCOME TO THE WARP THEME INSTALLER FOR LINUX${NC}"
-echo -e "\n${BOLD}${BLUE}Select Warp version for theme installation:${NC}"
+echo -e "\n${BOLD}${BLUE}WELCOME TO THE WARP THEME INSTALLER FOR MACOS${NC}"
+echo -e "\n${BLUE}Select Warp version for theme installation:${NC}"
 echo -e "${YELLOW}-----------------------------------------${NC}"
 echo -e "${YELLOW}[1]${NC} Install for Warp"
 echo -e "${YELLOW}[2]${NC} Install for Warp Preview"
@@ -84,7 +86,7 @@ echo -e "${YELLOW}[Q]${NC} Quit"
 echo -e "${YELLOW}-----------------------------------------${NC}"
 
 # Get version selection
-read -p "Select version (1-3 or Q to quit): " -r version_selection
+read -r "?Select version (1-3 or Q to quit): " version_selection
 
 # Process version selection
 case $version_selection in
@@ -203,7 +205,7 @@ echo -e "${YELLOW}-----------------------------------------${NC}"
 
 # Prompt the user for selection
 echo ""
-read -p "Select themes to install (e.g., 1 3 5 or A for all): " -r selection
+read -r "?Select themes to install (e.g., 1 3 5 or A for all): " selection
 
 # Function to get proper version name from directory
 get_version_name() {
@@ -294,7 +296,7 @@ else
   for dir in "${install_dirs[@]}"; do
     version_name=$(get_version_name "$dir")
     echo -e "\n${BLUE}Installing selected themes for $version_name...${NC}"
-    for index in $selection; do
+    for index in ${(z)selection}; do
       if [[ -n "${themes[$index]}" ]]; then
         install_theme "${themes[$index]}" "${file_map[$index]}" "$dir"
       else
@@ -306,7 +308,7 @@ fi
 
 # Display installation summary
 echo -e "\n${BLUE}Installation Summary:${NC}"
-if [[ ${#installed_themes[@]} -gt 0 ]]; then
+if (( ${#installed_themes[@]} > 0 )); then
   echo -e "${GREEN}✓ Installed themes:${NC}"
 
   # Create arrays for each version
@@ -314,7 +316,7 @@ if [[ ${#installed_themes[@]} -gt 0 ]]; then
   declare -a preview_installed=()
 
   # Sort themes into version-specific arrays with their background status
-  for key in "${!installed_themes[@]}"; do
+  for key in "${(@k)installed_themes}"; do
     theme_info="${installed_themes[$key]}"
     bg_status="${background_status[$key]}"
 
@@ -346,7 +348,7 @@ if [[ ${#installed_themes[@]} -gt 0 ]]; then
   unset IFS
 
   # Display Warp themes if any exist
-  if [ ${#sorted_warp_installed[@]} -gt 0 ]; then
+  if (( ${#sorted_warp_installed[@]} > 0 )); then
     echo -e "  ${BLUE}Warp:${NC}"
     for theme in "${sorted_warp_installed[@]}"; do
       echo "    - $theme"
@@ -354,7 +356,7 @@ if [[ ${#installed_themes[@]} -gt 0 ]]; then
   fi
 
   # Display Warp Preview themes if any exist
-  if [ ${#sorted_preview_installed[@]} -gt 0 ]; then
+  if (( ${#sorted_preview_installed[@]} > 0 )); then
     echo -e "  ${BLUE}Warp Preview:${NC}"
     for theme in "${sorted_preview_installed[@]}"; do
       echo "    - $theme"
@@ -362,12 +364,12 @@ if [[ ${#installed_themes[@]} -gt 0 ]]; then
   fi
 fi
 
-if [[ ${#existing_themes[@]} -gt 0 ]]; then
+if (( ${#existing_themes[@]} > 0 )); then
   # Count how many themes should be installed in total
   total_expected=$((${#themes[@]} * ${#install_dirs[@]}))
 
   # If everything is already installed, show a simpler message
-  if [[ ${#existing_themes[@]} -eq $total_expected && ${#installed_themes[@]} -eq 0 && ${#failed_themes[@]} -eq 0 ]]; then
+  if (( ${#existing_themes[@]} == total_expected && ${#installed_themes[@]} == 0 && ${#failed_themes[@]} == 0 )); then
     echo -e "${YELLOW}• All themes are already installed in selected version(s)${NC}"
   else
     echo -e "${YELLOW}• Already installed themes:${NC}"
@@ -377,7 +379,7 @@ if [[ ${#existing_themes[@]} -gt 0 ]]; then
     declare -a preview_themes=()
 
     # Sort themes into version-specific arrays
-    for key in "${!existing_themes[@]}"; do
+    for key in "${(@k)existing_themes}"; do
       theme_info="${existing_themes[$key]}"
       if [[ "$theme_info" == *"in Warp Preview"* ]]; then
         # Strip "in Warp Preview" and add to preview array
@@ -396,7 +398,7 @@ if [[ ${#existing_themes[@]} -gt 0 ]]; then
     unset IFS
 
     # Display Warp themes if any exist
-    if [ ${#sorted_warp[@]} -gt 0 ]; then
+    if (( ${#sorted_warp[@]} > 0 )); then
       echo -e "  ${BLUE}Warp:${NC}"
       for theme in "${sorted_warp[@]}"; do
         echo "    - $theme"
@@ -404,7 +406,7 @@ if [[ ${#existing_themes[@]} -gt 0 ]]; then
     fi
 
     # Display Warp Preview themes if any exist
-    if [ ${#sorted_preview[@]} -gt 0 ]; then
+    if (( ${#sorted_preview[@]} > 0 )); then
       echo -e "  ${BLUE}Warp Preview:${NC}"
       for theme in "${sorted_preview[@]}"; do
         echo "    - $theme"
@@ -413,7 +415,7 @@ if [[ ${#existing_themes[@]} -gt 0 ]]; then
   fi
 fi
 
-if [[ ${#failed_themes[@]} -gt 0 ]]; then
+if (( ${#failed_themes[@]} > 0 )); then
   echo -e "${RED}✗ Failed installations:${NC}"
 
   # Create arrays for each version
@@ -421,7 +423,7 @@ if [[ ${#failed_themes[@]} -gt 0 ]]; then
   declare -a preview_failed=()
 
   # Sort themes into version-specific arrays
-  for key in "${!failed_themes[@]}"; do
+  for key in "${(@k)failed_themes}"; do
     theme_info="${failed_themes[$key]}"
     if [[ "$theme_info" == *"in Warp Preview"* ]]; then
       # Strip "in Warp Preview" and add to preview array
@@ -440,7 +442,7 @@ if [[ ${#failed_themes[@]} -gt 0 ]]; then
   unset IFS
 
   # Display Warp themes if any exist
-  if [ ${#sorted_warp_failed[@]} -gt 0 ]; then
+  if (( ${#sorted_warp_failed[@]} > 0 )); then
     echo -e "  ${BLUE}Warp:${NC}"
     for theme in "${sorted_warp_failed[@]}"; do
       echo "    - $theme"
@@ -448,7 +450,7 @@ if [[ ${#failed_themes[@]} -gt 0 ]]; then
   fi
 
   # Display Warp Preview themes if any exist
-  if [ ${#sorted_preview_failed[@]} -gt 0 ]; then
+  if (( ${#sorted_preview_failed[@]} > 0 )); then
     echo -e "  ${BLUE}Warp Preview:${NC}"
     for theme in "${sorted_preview_failed[@]}"; do
       echo "    - $theme"
