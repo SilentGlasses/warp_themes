@@ -21,7 +21,7 @@ This project includes easy-to-use scripts, `install.sh` for macOS and Linux and 
 
 
 >[!NOTE]
-> **The Liquid Glass themes only works well on MacOS**
+> **The Liquid Glass themes only work well on MacOS**
 
 ## Features:
 
