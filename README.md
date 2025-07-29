@@ -16,16 +16,13 @@
 
 If you want to get Warp, download it from [here](https://app.warp.dev/referral/2K4GVJ)
 
-This project includes easy-to-use scripts, `install.sh` for macOS and Linux and `install.ps1` for Windows, that automates the installation of Warp themes from this repository. The script fetches available theme files directly from the repository and installs them to the correct location on your system based on your operating system.
-
-
+This project includes easy-to-use scripts that automates the installation of Warp themes from this repository. The script fetches available theme files directly from the repository and installs them to the correct location on your system based on your operating system.
 
 >[!NOTE]
 > **The Liquid Glass themes only work well on MacOS**
 
 ## Features:
 
-- **Automatic OS Detection**: The script detects whether you're using macOS or Linux and installs the themes in the appropriate directory.
 - **Fetches Available Themes**: It pulls the list of themes directly from the repository, and updates the list as new themes are added.
 - **Interactive Menu**: A clean, interactive menu displays all available themes, allowing you to select themes by number or install all themes at once.
 - **Background Image Support**: For themes that include a background image, the installer will automatically download and install the corresponding image.
@@ -71,9 +68,9 @@ irm https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install.ps1
 - Select the newly installed theme to enable it
 - Enjoy your new theme
 
-## My Setup
+## My Personal Setup
 
-For my specific setup I use the following:
+I use the following on both my mac and Linux machines:
 
 - Zsh
 - Oh My Zsh
@@ -89,14 +86,14 @@ Some themes include background images that will be automatically installed by th
 ### Liquid Glass Dark
 
 >[!NOTE]
-> **This theme only works well on MacOS**
+> **This theme only works well on MacOS**. It calls for a background but there is non. This is the only way I could get the right background transparency effect.
 
 <img src="./screenshots/liquid_glass_dark.png" alt="Liquid Glass Dark" width="850">
 
 ### Liquid Glass Light
 
 >[!NOTE]
-> **This theme only works well on MacOS**
+> **This theme only works well on MacOS**. It calls for a background but there is non. This is the only way I could get the right background transparency effect.
 
 <img src="./screenshots/liquid_glass_light.png" alt="Liquid Glass Light" width="850">
 
