@@ -38,6 +38,9 @@ This project includes easy-to-use scripts that automates the installation of War
 bash <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_installer.sh)
 ```
 
+> [!CAUTION]
+> Due to the age of Bash that ships with macOS, the installer is currently having some issues. I am currently working on it as part of [issue #58](https://github.com/SilentGlasses/warp_themes/issues/58).
+
 ### For Linux
 
 - Run this command to initiate the installer, choose the theme you want to use or install them all:
