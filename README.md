@@ -34,21 +34,21 @@ This project includes easy-to-use scripts that automates the installation of War
 ### For Mac
 
 - Run this command to initiate the installer, choose the theme you want to use or install them all:
+
 ```
 zsh <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_install.zsh)
 ```
 
-Fallback if you run Bash.
+- Fallback if you run Bash.
+
 ```
 bash <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_installer.sh)
 ```
 
-> [!CAUTION]
-> Due to the age of Bash that ships with macOS, the installer is currently having some issues. I am currently working on it as part of [issue #58](https://github.com/SilentGlasses/warp_themes/issues/58).
-
 ### For Linux
 
 - Run this command to initiate the installer, choose the theme you want to use or install them all:
+
 ```
 bash <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install.sh)
 ```
@@ -60,10 +60,13 @@ bash <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/
 > Thanks for your understanding and patience.
 
 - Ensure PowerShell Allows Script Execution, open PowerShell as Administrator and run:
+
 ```
 Set-ExecutionPolicy Bypass -Scope Process -Force
 ```
+
 - Run the script from PowerShell:
+
 ```
 irm https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install.ps1 | iex
 ```
