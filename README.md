@@ -35,6 +35,11 @@ This project includes easy-to-use scripts that automates the installation of War
 
 - Run this command to initiate the installer, choose the theme you want to use or install them all:
 ```
+zsh <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_install.zsh)
+```
+
+Fallback if you run Bash.
+```
 bash <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_installer.sh)
 ```
 
