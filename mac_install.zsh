@@ -42,7 +42,7 @@ validate_theme_file() {
 retry_curl() {
     local url="$1"
     local output="$2"
-    local max_attempts=3
+    local max_attempts=2
     local attempt=1
     local wait_time=1
 
@@ -270,19 +270,6 @@ install_theme() {
       echo -e "${YELLOW}Warning: Could not download background image for $theme_name${NC}"
     fi
   fi
-
-  # Debug output
-  echo "Debug: theme_name='$theme_name', version_name='$version_name', install_key='$install_key'"
-  
-  if [[ -n "$theme_name" && -n "$version_name" ]]; then
-    installed_themes["$install_key"]="$theme_name in $version_name"
-    background_status["$install_key"]="$background_installed"
-    echo "Debug: Added to installed_themes[\"$install_key\"] = \"${installed_themes[\"$install_key\"]}\""
-  else
-    echo "Warning: Blank theme information found for key $install_key"
-    echo "Debug: theme_name='$theme_name', version_name='$version_name'"
-  fi
-  return 0
 }
 
 # Arrays to track installation outcomes
@@ -393,7 +380,6 @@ if (( ${#installed_themes[@]} > 0 )); then
   # If arrays are empty but we have installed themes, there might be an issue
   if (( ${#sorted_warp_installed[@]} == 0 && ${#sorted_preview_installed[@]} == 0 )); then
     echo -e "  ${YELLOW}Note: Themes were installed but not displayed in summary${NC}"
-    echo -e "  ${YELLOW}Debug info:${NC}"
     echo "    - installed_themes array size: ${#installed_themes[@]}"
     echo "    - warp_installed array size: ${#warp_installed[@]}"
     echo "    - preview_installed array size: ${#preview_installed[@]}"
