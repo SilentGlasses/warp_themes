@@ -1,18 +1,26 @@
+# Ensure script-scope variables for controls are available everywhere
+$script:checkedListBox = $null
+$script:statusBar = $null
+$script:buttonPanel = $null
+$script:installSelectedButton = $null
+$script:installAllButton = $null
+$script:exitButton = $null
+$script:selectAllButton = $null
 # Define variables
 $repoRawUrl = "https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/yaml_files"
 $backgroundsRawUrl = "https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/backgrounds"
 $repoApiUrl = "https://api.github.com/repos/SilentGlasses/warp_themes/contents/yaml_files"
 $warpThemePath = "${env:AppData}\warp\Warp\data\themes"
-$warpPreviewThemePath = "${env:AppData}\warp-preview\Warp\data\themes"
+$warpPreviewThemePath = "${env:AppData}\warp\WarpPreview\data\themes"
 
 # To keep track of selected version
-$global:selectedPaths = @()
+$script:selectedPaths = @()
 
 # Ensure the destination directories exist
-function Ensure-DestinationDirectories {
-    foreach ($path in $global:selectedPaths) {
+function Confirm-DestinationDirectoriesExist { # Renamed from Ensure-DestinationDirectories
+    foreach ($path in $script:selectedPaths) {
         if (-not (Test-Path $path)) {
-            Write-Host "Creating theme directory for $($path.Contains('preview') ? 'Warp Preview' : 'Warp')..."
+            Write-Host "Creating theme directory for $(if ($path.Contains('preview')) { 'Warp Preview' } else { 'Warp' })..."
             New-Item -ItemType Directory -Path $path -Force | Out-Null
         }
     }
@@ -23,7 +31,13 @@ function Get-ThemeFiles {
     Write-Host "Fetching list of theme files..."
     try {
         $themeFilesResponse = Invoke-RestMethod -Uri $repoApiUrl
-        return $themeFilesResponse | Where-Object { $_.name -match "\.yaml$" } | ForEach-Object { $_.name }
+        $themeNames = @()
+        foreach ($item in $themeFilesResponse) {
+            if ($item.name -match "\.yaml$") {
+                $themeNames += $item.name
+            }
+        }
+        return $themeNames
     } catch {
         Write-Host "Error fetching theme files: $($_)"
         exit 1
@@ -50,7 +64,7 @@ function Install-Themes {
     $alreadyInstalledThemes = @{}
     $themeBackgroundStatus = @{}
     
-    foreach ($installPath in $global:selectedPaths) {
+    foreach ($installPath in $script:selectedPaths) {
         $versionName = if ($installPath -like "*preview*") { "Warp Preview" } else { "Warp" }
         Write-Host "Installing themes for $versionName..."
 
@@ -77,7 +91,7 @@ function Install-Themes {
                 try {
                     $fileUrl = "$repoRawUrl/$file"
                     $destinationPath = "$installPath\$file"
-                    Invoke-WebRequest -Uri $fileUrl -OutFile $destinationPath
+                    Invoke-WebRequest -Uri $fileUrl -OutFile $destinationPath -ErrorAction Stop # Added -ErrorAction Stop
                     
                     if (-not $installedThemes.ContainsKey($versionName)) {
                         $installedThemes[$versionName] = @()
@@ -86,26 +100,26 @@ function Install-Themes {
                     
                     # Check for background image in the theme file
                     $themeContent = Get-Content -Path $destinationPath -Raw
-                    if ($themeContent -match "background_image:\s*\n\s*path:\s*['\"]([^'\"]+)['\"]") {
+                    if ($themeContent -match 'background_image:\s*\n\s*path:\s*[''"]([^''"]+)[''"]') {
                         $bgImageFile = $matches[1]
                         $bgImageDestination = "$installPath\$bgImageFile"
                         
                         # Check if background image already exists
                         if (Test-Path $bgImageDestination) {
-                            $themeBackgroundStatus["$versionName::$file"] = "exists"
+                            $themeBackgroundStatus["${versionName}::${file}"] = "exists"
                         } else {
                             try {
                                 $bgImageUrl = "$backgroundsRawUrl/$bgImageFile"
                                 Invoke-WebRequest -Uri $bgImageUrl -OutFile $bgImageDestination -ErrorAction Stop
-                                $themeBackgroundStatus["$versionName::$file"] = "installed"
+                                $themeBackgroundStatus["${versionName}::${file}"] = "installed"
                             } catch {
-                                $themeBackgroundStatus["$versionName::$file"] = "failed"
-                                Write-Host "Warning: Could not download background image for $themeName in $versionName: $($_.Exception.Message)"
+                                $themeBackgroundStatus["${versionName}::${file}"] = "failed"
+                                Write-Host "Warning: Could not download background image for $themeName in $versionName - $($_.Exception.Message)"
                             }
                         }
                     }
                 } catch {
-                    [System.Windows.Forms.MessageBox]::Show("Error installing $themeName for $versionName: $(${($_.Exception.Message)})", "Error")
+                    [System.Windows.Forms.MessageBox]::Show("Error installing $themeName for $versionName - $($_.Exception.Message)", "Error")
                 }
             }
         }
@@ -119,7 +133,7 @@ function Install-Themes {
         $totalAlreadyInstalled += $alreadyInstalledThemes[$version].Count
     }
     
-    $totalExpected = $themes.Count * $global:selectedPaths.Count
+    $totalExpected = $themes.Count * $script:selectedPaths.Count 
     
     if ($isInstallAll -and $totalAlreadyInstalled -eq $totalExpected) {
         $message = "All themes are already installed in selected version(s)!"
@@ -134,14 +148,14 @@ function Install-Themes {
             $message += "The following themes have been installed successfully:`n"
             
             foreach ($version in $installedThemes.Keys) {
-                $message += "`n$version:`n"
+                $message += "`n${version}:`n"
                 foreach ($theme in $installedThemes[$version]) {
                     $themeName = Split-Path $theme -LeafBase
                     $statusSuffix = ""
                     
                     # Add background image status if applicable
-                    if ($themeBackgroundStatus.ContainsKey("$version::$theme")) {
-                        switch ($themeBackgroundStatus["$version::$theme"]) {
+                    if ($themeBackgroundStatus.ContainsKey("${version}::${theme}")) {
+                        switch ($themeBackgroundStatus["${version}::${theme}"]) {
                             "installed" { $statusSuffix = " (with background image)" }
                             "exists" { $statusSuffix = " (background image already exists)" }
                             "failed" { $statusSuffix = " (background image not found)" }
@@ -161,7 +175,7 @@ function Install-Themes {
             $message += "The following themes were already installed:`n"
             
             foreach ($version in $alreadyInstalledThemes.Keys) {
-                $message += "`n$version:`n"
+                $message += "`n${version}:`n"
                 foreach ($theme in $alreadyInstalledThemes[$version]) {
                     $themeName = Split-Path $theme -LeafBase
                     $message += "  - $themeName`n"
@@ -176,9 +190,9 @@ function Install-Themes {
     
     # Add installation paths
     $message += "`n`nInstallation paths:"
-    foreach ($path in $global:selectedPaths) {
+    foreach ($path in $script:selectedPaths) {
         $versionName = if ($path -like "*preview*") { "Warp Preview" } else { "Warp" }
-        $message += "`n  - $versionName: $path"
+        $message += "`n  - ${versionName}: $path"
     }
 
     [System.Windows.Forms.MessageBox]::Show($message, "Installation Summary")
@@ -187,8 +201,8 @@ function Install-Themes {
 # Create combined GUI for version and theme selection
 function New-CombinedInstallerGUI {
     param ($themeFiles)
-    Add-Type -AssemblyName System.Windows.Forms
-    Add-Type -AssemblyName System.Drawing
+    [void](Add-Type -AssemblyName System.Windows.Forms)
+    [void](Add-Type -AssemblyName System.Drawing)
 
     # Make the process DPI-aware
     Set-ProcessDPIAware
@@ -209,10 +223,10 @@ function New-CombinedInstallerGUI {
     $mainLayout.ColumnCount = 1
     $mainLayout.Padding = New-Object System.Windows.Forms.Padding(0)
     $mainLayout.Margin = New-Object System.Windows.Forms.Padding(0)
-    $mainLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute, 150)))
-    $mainLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute, 40)))
-    $mainLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent, 100)))
-    $mainLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute, 70)))
+    [void]$mainLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute, 150)))
+    [void]$mainLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute, 40)))
+    [void]$mainLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent, 100)))
+    [void]$mainLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute, 75))) 
     $form.Controls.Add($mainLayout)
     
     #
@@ -223,75 +237,77 @@ function New-CombinedInstallerGUI {
     $versionPanel.Padding = New-Object System.Windows.Forms.Padding(0)
     $versionPanel.Margin = New-Object System.Windows.Forms.Padding(0)
     $mainLayout.Controls.Add($versionPanel, 0, 0)
-    
+
+    # Use a vertical FlowLayoutPanel for proper stacking
+    $versionFlow = New-Object System.Windows.Forms.FlowLayoutPanel
+    $versionFlow.Dock = [System.Windows.Forms.DockStyle]::Fill
+    $versionFlow.FlowDirection = [System.Windows.Forms.FlowDirection]::TopDown
+    $versionFlow.WrapContents = $false
+    $versionFlow.AutoSize = $true
+    $versionPanel.Controls.Add($versionFlow)
+
     # Title label
     $titleLabel = New-Object System.Windows.Forms.Label
     $titleLabel.Text = "Select Warp version for theme installation:"
     $titleLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable", 12, [System.Drawing.FontStyle]::Bold)
-    $titleLabel.Location = New-Object System.Drawing.Point(20, 20)
     $titleLabel.AutoSize = $true
-    $versionPanel.Controls.Add($titleLabel)
-    
+    $versionFlow.Controls.Add($titleLabel)
+
     # Top separator
     $topSeparator = New-Object System.Windows.Forms.Label
     $topSeparator.Text = "-----------------------------------------"
-    $topSeparator.Location = New-Object System.Drawing.Point(20, 50)
     $topSeparator.AutoSize = $true
     $topSeparator.ForeColor = [System.Drawing.Color]::FromArgb(0, 120, 212)
-    $versionPanel.Controls.Add($topSeparator)
-    
-    # Radio buttons panel
-    $radioPanel = New-Object System.Windows.Forms.Panel
-    $radioPanel.Location = New-Object System.Drawing.Point(20, 80)
-    $radioPanel.Size = New-Object System.Drawing.Size(760, 70)
-    $versionPanel.Controls.Add($radioPanel)
-    
+    $versionFlow.Controls.Add($topSeparator)
+
+    # Radio buttons panel (horizontal)
+    $radioPanel = New-Object System.Windows.Forms.FlowLayoutPanel
+    $radioPanel.FlowDirection = [System.Windows.Forms.FlowDirection]::LeftToRight
+    $radioPanel.WrapContents = $false
+    $radioPanel.AutoSize = $true
+    $versionFlow.Controls.Add($radioPanel)
+
     # Radio buttons
     $radioWarp = New-Object System.Windows.Forms.RadioButton
     $radioWarp.Text = "Install for Warp"
-    $radioWarp.Location = New-Object System.Drawing.Point(10, 10)
     $radioWarp.AutoSize = $true
     $radioWarp.Checked = $true
     $radioPanel.Controls.Add($radioWarp)
-    
+
     $radioPreview = New-Object System.Windows.Forms.RadioButton
     $radioPreview.Text = "Install for Warp Preview"
-    $radioPreview.Location = New-Object System.Drawing.Point(200, 10)
     $radioPreview.AutoSize = $true
     $radioPanel.Controls.Add($radioPreview)
-    
+
     $radioBoth = New-Object System.Windows.Forms.RadioButton
     $radioBoth.Text = "Install for both versions"
-    $radioBoth.Location = New-Object System.Drawing.Point(450, 10)
     $radioBoth.AutoSize = $true
     $radioPanel.Controls.Add($radioBoth)
-    
+
     # Apply version selection
     $applyVersionButton = New-Object System.Windows.Forms.Button
     $applyVersionButton.Text = "Apply Version Selection"
-    $applyVersionButton.Location = New-Object System.Drawing.Point(20, 150)
     $applyVersionButton.Width = 200
     $applyVersionButton.BackColor = [System.Drawing.Color]::FromArgb(0, 120, 212)
     $applyVersionButton.ForeColor = [System.Drawing.Color]::White
     $applyVersionButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
-    $applyVersionButton.Add_Click({
-        if ($radioWarp.Checked) {
-            $global:selectedPaths = @($warpThemePath)
-            $statusBar.Text = "Selected: Warp"
-        } elseif ($radioPreview.Checked) {
-            $global:selectedPaths = @($warpPreviewThemePath)
-            $statusBar.Text = "Selected: Warp Preview"
-        } else {
-            $global:selectedPaths = @($warpThemePath, $warpPreviewThemePath)
-            $statusBar.Text = "Selected: Both Warp and Warp Preview"
+    $versionFlow.Controls.Add($applyVersionButton)
+
+    # Select All button - adds convenience for selecting all themes
+    $script:selectAllButton = New-Object System.Windows.Forms.Button
+    $script:selectAllButton.Text = "Select All Themes"
+    $script:selectAllButton.Width = 150
+    $script:selectAllButton.BackColor = [System.Drawing.Color]::FromArgb(230, 230, 230)
+    $script:selectAllButton.ForeColor = [System.Drawing.Color]::Black
+    $script:selectAllButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
+    $script:selectAllButton.Enabled = $false
+    $script:selectAllButton.Add_Click({
+        for ($i = 0; $i -lt $script:checkedListBox.Items.Count; $i++) {
+            $script:checkedListBox.SetItemChecked($i, $true)
         }
-        
-        # Enable theme selection controls
-        $checkedListBox.Enabled = $true
-        $installSelectedButton.Enabled = $true
-        $installAllButton.Enabled = $true
+        $script:statusBar.Text = "All themes selected."
     })
-    $versionPanel.Controls.Add($applyVersionButton)
+    $versionFlow.Controls.Add($script:selectAllButton)
     
     #
     # MIDDLE SECTION - SEPARATOR
@@ -316,17 +332,19 @@ function New-CombinedInstallerGUI {
     $mainLayout.Controls.Add($themePanel, 0, 2)
     
     # Initialize the CheckedListBox
-    $checkedListBox = New-Object System.Windows.Forms.CheckedListBox
-    $checkedListBox.Dock = [System.Windows.Forms.DockStyle]::Fill
-    $checkedListBox.CheckOnClick = $true
-    $checkedListBox.MultiColumn = $true
-    $checkedListBox.ColumnWidth = 270
-    $checkedListBox.Font = New-Object System.Drawing.Font("Segoe UI Variable", 10)
-    $checkedListBox.ItemHeight = 30
-    $checkedListBox.Padding = New-Object System.Windows.Forms.Padding(10)
-    $checkedListBox.Enabled = $false  # Disabled until version is selected
-    $themeFiles | ForEach-Object { $checkedListBox.Items.Add($_) }
-    $themePanel.Controls.Add($checkedListBox)
+    $script:checkedListBox = New-Object System.Windows.Forms.CheckedListBox
+    $script:checkedListBox.Dock = [System.Windows.Forms.DockStyle]::Fill
+    $script:checkedListBox.CheckOnClick = $true
+    $script:checkedListBox.MultiColumn = $true
+    $script:checkedListBox.ColumnWidth = 270
+    $script:checkedListBox.Font = New-Object System.Drawing.Font("Segoe UI Variable", 10)
+    $script:checkedListBox.ItemHeight = 30
+    $script:checkedListBox.Padding = New-Object System.Windows.Forms.Padding(10)
+    $script:checkedListBox.Enabled = $false  # Disabled until version is selected
+    foreach ($theme in $themeFiles) {
+        [void]$script:checkedListBox.Items.Add($theme)
+    }
+    $themePanel.Controls.Add($script:checkedListBox)
     
     #
     # BOTTOM SECTION - ACTION BUTTONS AND STATUS
@@ -336,117 +354,120 @@ function New-CombinedInstallerGUI {
     $mainLayout.Controls.Add($actionPanel, 0, 3)
     
     # Status bar
-    $statusBar = New-Object System.Windows.Forms.Label
-    $statusBar.Text = "Please select a Warp version and apply selection."
-    $statusBar.Location = New-Object System.Drawing.Point(20, 45)
-    $statusBar.Size = New-Object System.Drawing.Size(760, 25)
-    $statusBar.Font = New-Object System.Drawing.Font("Segoe UI Variable", 9)
-    $statusBar.TextAlign = [System.Drawing.ContentAlignment]::MiddleLeft
-    $actionPanel.Controls.Add($statusBar)
+    $script:statusBar = New-Object System.Windows.Forms.Label
+    $script:statusBar.Text = "Please select a Warp version and apply selection."
+    $script:statusBar.Location = New-Object System.Drawing.Point(20, 45)
+    $script:statusBar.Size = New-Object System.Drawing.Size(760, 30) 
+    $script:statusBar.Font = New-Object System.Drawing.Font("Segoe UI Variable", 9)
+    $script:statusBar.TextAlign = [System.Drawing.ContentAlignment]::MiddleLeft
+    $actionPanel.Controls.Add($script:statusBar)
     
     # Button panel
-    $buttonPanel = New-Object System.Windows.Forms.FlowLayoutPanel
-    $buttonPanel.Location = New-Object System.Drawing.Point(20, 10)
-    $buttonPanel.Size = New-Object System.Drawing.Size(760, 35)
-    $buttonPanel.FlowDirection = [System.Windows.Forms.FlowDirection]::LeftToRight
-    $buttonPanel.AutoSize = $true
-    $buttonPanel.WrapContents = $false
-    $actionPanel.Controls.Add($buttonPanel)
+    $script:buttonPanel = New-Object System.Windows.Forms.FlowLayoutPanel
+    $script:buttonPanel.Location = New-Object System.Drawing.Point(20, 10)
+    $script:buttonPanel.Size = New-Object System.Drawing.Size(760, 35)
+    $script:buttonPanel.FlowDirection = [System.Windows.Forms.FlowDirection]::LeftToRight
+    $script:buttonPanel.AutoSize = $true
+    $script:buttonPanel.WrapContents = $false
+    $actionPanel.Controls.Add($script:buttonPanel)
     
     # Install Selected button
-    $installSelectedButton = New-Object System.Windows.Forms.Button
-    $installSelectedButton.Text = "Install Selected"
-    $installSelectedButton.AutoSize = $true
-    $installSelectedButton.BackColor = [System.Drawing.Color]::FromArgb(0, 120, 212)
-    $installSelectedButton.ForeColor = [System.Drawing.Color]::White
-    $installSelectedButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
-    $installSelectedButton.Font = New-Object System.Drawing.Font("Segoe UI Variable", 10)
-    $installSelectedButton.Margin = New-Object System.Windows.Forms.Padding(0, 0, 20, 0)
-    $installSelectedButton.Width = 150
-    $installSelectedButton.Enabled = $false
-    $installSelectedButton.Add_Click({
-        if ($global:selectedPaths.Count -eq 0) {
-            $statusBar.Text = "Error: No Warp version selected. Please select a version first."
+    $script:installSelectedButton = New-Object System.Windows.Forms.Button
+    $script:installSelectedButton.Text = "Install Selected"
+    $script:installSelectedButton.AutoSize = $true
+    $script:installSelectedButton.BackColor = [System.Drawing.Color]::FromArgb(0, 120, 212)
+    $script:installSelectedButton.ForeColor = [System.Drawing.Color]::White
+    $script:installSelectedButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
+    $script:installSelectedButton.Font = New-Object System.Drawing.Font("Segoe UI Variable", 10)
+    $script:installSelectedButton.Margin = New-Object System.Windows.Forms.Padding(0, 0, 20, 0)
+    $script:installSelectedButton.Width = 150
+    $script:installSelectedButton.Enabled = $false
+    $script:installSelectedButton.Add_Click({
+        if ($script:selectedPaths.Count -eq 0) {
+            $script:statusBar.Text = "Error: No Warp version selected. Please select a version first."
             return
         }
         
-        $selectedThemes = $checkedListBox.CheckedItems
+        $selectedThemes = $script:checkedListBox.CheckedItems
         
         if ($selectedThemes.Count -eq 0) {
-            $statusBar.Text = "Error: No themes selected. Please select at least one theme."
+            $script:statusBar.Text = "Error: No themes selected. Please select at least one theme."
             return
         }
         
-        $statusBar.Text = "Installing selected themes..."
-        Ensure-DestinationDirectories
+        $script:statusBar.Text = "Installing selected themes..."
+        Confirm-DestinationDirectoriesExist # Updated call
         Install-Themes -themes $selectedThemes -isInstallAll $false
-        $statusBar.Text = "Installation completed."
+        $script:statusBar.Text = "Installation completed."
     })
-    $buttonPanel.Controls.Add($installSelectedButton)
+    $script:buttonPanel.Controls.Add($script:installSelectedButton)
     
     # Install All button
-    $installAllButton = New-Object System.Windows.Forms.Button
-    $installAllButton.Text = "Install All"
-    $installAllButton.AutoSize = $true
-    $installAllButton.BackColor = [System.Drawing.Color]::FromArgb(0, 120, 212)
-    $installAllButton.ForeColor = [System.Drawing.Color]::White
-    $installAllButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
-    $installAllButton.Font = New-Object System.Drawing.Font("Segoe UI Variable", 10)
-    $installAllButton.Margin = New-Object System.Windows.Forms.Padding(0, 0, 20, 0)
-    $installAllButton.Width = 150
-    $installAllButton.Enabled = $false
-    $installAllButton.Add_Click({
-        if ($global:selectedPaths.Count -eq 0) {
-            $statusBar.Text = "Error: No Warp version selected. Please select a version first."
+    $script:installAllButton = New-Object System.Windows.Forms.Button
+    $script:installAllButton.Text = "Install All"
+    $script:installAllButton.AutoSize = $true
+    $script:installAllButton.BackColor = [System.Drawing.Color]::FromArgb(0, 120, 212)
+    $script:installAllButton.ForeColor = [System.Drawing.Color]::White
+    $script:installAllButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
+    $script:installAllButton.Font = New-Object System.Drawing.Font("Segoe UI Variable", 10)
+    $script:installAllButton.Margin = New-Object System.Windows.Forms.Padding(0, 0, 20, 0)
+    $script:installAllButton.Width = 150
+    $script:installAllButton.Enabled = $false
+    $script:installAllButton.Add_Click({
+        if ($script:selectedPaths.Count -eq 0) {
+            $script:statusBar.Text = "Error: No Warp version selected. Please select a version first."
             return
         }
         
-        $statusBar.Text = "Installing all themes..."
-        Ensure-DestinationDirectories
+        $script:statusBar.Text = "Installing all themes..."
+        Confirm-DestinationDirectoriesExist # Updated call
         Install-Themes -themes $themeFiles -isInstallAll $true
-        $statusBar.Text = "Installation completed."
+        $script:statusBar.Text = "Installation completed."
     })
-    $buttonPanel.Controls.Add($installAllButton)
+    $script:buttonPanel.Controls.Add($script:installAllButton)
     
     # Exit button
-    $exitButton = New-Object System.Windows.Forms.Button
-    $exitButton.Text = "Exit"
-    $exitButton.AutoSize = $true
-    $exitButton.BackColor = [System.Drawing.Color]::FromArgb(230, 230, 230)
-    $exitButton.ForeColor = [System.Drawing.Color]::Black
-    $exitButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
-    $exitButton.Font = New-Object System.Drawing.Font("Segoe UI Variable", 10)
-    $exitButton.Margin = New-Object System.Windows.Forms.Padding(0)
-    $exitButton.Width = 100
-    $exitButton.Add_Click({
+    $script:exitButton = New-Object System.Windows.Forms.Button
+    $script:exitButton.Text = "Exit"
+    $script:exitButton.AutoSize = $true
+    $script:exitButton.BackColor = [System.Drawing.Color]::FromArgb(230, 230, 230)
+    $script:exitButton.ForeColor = [System.Drawing.Color]::Black
+    $script:exitButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
+    $script:exitButton.Font = New-Object System.Drawing.Font("Segoe UI Variable", 10)
+    $script:exitButton.Margin = New-Object System.Windows.Forms.Padding(0)
+    $script:exitButton.Width = 100
+    $script:exitButton.Add_Click({
         $form.Close()
     })
-    $buttonPanel.Controls.Add($exitButton)
+    $script:buttonPanel.Controls.Add($script:exitButton)
     
-    # Select All button - adds convenience for selecting all themes
-    $selectAllButton = New-Object System.Windows.Forms.Button
-    $selectAllButton.Text = "Select All Themes"
-    $selectAllButton.Location = New-Object System.Drawing.Point(650, 150)
-    $selectAllButton.Width = 150
-    $selectAllButton.BackColor = [System.Drawing.Color]::FromArgb(230, 230, 230)
-    $selectAllButton.ForeColor = [System.Drawing.Color]::Black
-    $selectAllButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
-    $selectAllButton.Enabled = $false
-    $selectAllButton.Add_Click({
-        for ($i = 0; $i -lt $checkedListBox.Items.Count; $i++) {
-            $checkedListBox.SetItemChecked($i, $true)
+    # (moved above into $versionFlow)
+
+    # Now that all controls are created, add the event handler for Apply Version Selection
+    $applyVersionButton.Add_Click({
+        
+        if ($radioWarp.Checked) {
+            $script:selectedPaths = @($warpThemePath)
+            $script:statusBar.Text = "Selected: Warp"
+        } elseif ($radioPreview.Checked) {
+            $script:selectedPaths = @($warpPreviewThemePath)
+            $script:statusBar.Text = "Selected: Warp Preview"
+        } else {
+            $script:selectedPaths = @($warpThemePath, $warpPreviewThemePath)
+            $script:statusBar.Text = "Selected: Both Warp and Warp Preview"
         }
-        $statusBar.Text = "All themes selected."
+
+        # Enable theme selection controls
+        $script:checkedListBox.Enabled = $true
+        $script:installSelectedButton.Enabled = $true
+        $script:installAllButton.Enabled = $true
+        $script:selectAllButton.Enabled = $true
     })
-    $versionPanel.Controls.Add($selectAllButton)
     
-    # When apply version is clicked, also enable the select all button
-    $applyVersionButton.Add_Click.Add({
-        $selectAllButton.Enabled = $true
-    })
+    # Event handler for Apply Version Selection button is defined above
     
     # Show the form
-    $form.ShowDialog()
+    $null = $form.ShowDialog()
 }
 
 # Main execution
