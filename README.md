@@ -1,18 +1,6 @@
-```
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡞⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⣦
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡞⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿
-⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿
-⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿
-⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿
-⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿
-⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿
-⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿
-⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿
-⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿
-⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⠟
-⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟   Themes for
-⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟    Warp Terminal
-```
+<img align="left" width="75" height="75" src="assets/warp_themes_light.png">
+
+# Warp Themes
 
 If you want to get Warp, download it from [here](https://app.warp.dev/referral/2K4GVJ)
 
@@ -34,13 +22,10 @@ This project includes easy-to-use scripts that automates the installation of War
 ### For Mac
 
 - Run this command to initiate the installer, choose the theme you want to use or install them all:
-
 ```
 zsh <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_install.zsh)
 ```
-
 - Fallback if you run Bash.
-
 ```
 bash <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/mac_installer.sh)
 ```
@@ -48,7 +33,6 @@ bash <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/
 ### For Linux
 
 - Run this command to initiate the installer, choose the theme you want to use or install them all:
-
 ```
 bash <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install.sh)
 ```
@@ -56,19 +40,16 @@ bash <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/
 ### For Windows
 
 > [!NOTE]
-> The Windows Installer works at the moment, but it's still a work in progress, so don't expect too much.
+> The Windows Installer should work now, please open an issue if you have any issues.
 > Thanks for your understanding and patience.
 
 - Ensure PowerShell Allows Script Execution, open PowerShell as Administrator and run:
-
 ```
 Set-ExecutionPolicy Bypass -Scope Process -Force
 ```
-
 - Run the script from PowerShell:
-
 ```
-irm https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/win_installer.ps1 | iex
 ```
 
 ## Using Installed Themes
@@ -209,7 +190,6 @@ Some themes include background images that will be automatically installed by th
 ### Webs Dark
 
 <img src="./screenshots/webs_dark.png" alt="Webs Dark" width="850">
-
 
 ### White Rabbit Dark
 
