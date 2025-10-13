@@ -15,7 +15,6 @@ This project includes easy-to-use scripts that automates the installation of War
 - **Interactive Menu**: A clean, interactive menu displays all available themes, allowing you to select themes by number or install all themes at once.
 - **Background Image Support**: For themes that include a background image, the installer will automatically download and install the corresponding image.
 - **Installation Summary**: After installation, it provides a summary of installed themes, already existing themes, and failed installations, including background image status.
-- **Pretty Display**: The menu is formatted for clarity, making the installation process easy to follow.
 
 ## Installation
 
@@ -40,10 +39,21 @@ bash <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/
 ### For Windows
 
 > [!NOTE]
-> The Windows Installer should work now, please open an issue if you have any issues.
+> The Windows Installer should work now, please open an issue if you encounter any problems.
 > Thanks for your understanding and patience.
 
-- Ensure PowerShell Allows Script Execution, open PowerShell as Administrator and run:
+> [!IMPORTANT]
+> Execution policies are not a security boundary to restrict users; they are meant to prevent accidental script execution.
+>
+> The following options are allowed for the bypass should you want to adjust it to a different level:
+> 
+> - **Restricted**: No scripts are allowed to run (default).
+> - **RemoteSigned**: Local scripts run without a signature; remote scripts require a digital signature.
+> - **Unrestricted**: All scripts can run, but you'll get a warning for unsigned scripts.
+> - **Bypass**: No restrictions; scripts run without warnings or prompts.
+
+- Ensure that PowerShell Allows Script Execution, this method temporarily sets the execution policy for the current PowerShell session.
+- Open PowerShell as Administrator and run the following command:
 ```
 Set-ExecutionPolicy Bypass -Scope Process -Force
 ```
