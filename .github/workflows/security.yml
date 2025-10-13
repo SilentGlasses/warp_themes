@@ -16,8 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install PowerShell
-        uses: actions/setup-powershell@v2
+      - name: Setup PowerShell
+        uses: pwsh/setup-pwsh@v2
       - name: Install PSScriptAnalyzer
         run: pwsh -Command "Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser"
       - name: Run PSScriptAnalyzer
