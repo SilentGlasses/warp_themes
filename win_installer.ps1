@@ -1,5 +1,8 @@
-# Warp Theme Installer - Windows 11 Design Enhanced
-# PowerShell 5.1 Compatible Version
+# Warp Theme Installer
+
+# Load required assemblies early for PS 5.1 compatibility
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
 
 # Define variables
 $repoRawUrl = "https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/yaml_files"
@@ -88,7 +91,7 @@ function New-ModernButton {
         [int]$Width = 120,
         [int]$Height = 36
     )
-    
+
     $button = New-Object System.Windows.Forms.Button
     $button.Text = $Text
     $button.Size = New-Object System.Drawing.Size($Width, $Height)
@@ -101,13 +104,13 @@ function New-ModernButton {
     $button.Cursor = [System.Windows.Forms.Cursors]::Hand
     $button.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
     $button.UseVisualStyleBackColor = $false
-    
+
     # Store original colors for hover effect
     $button.Tag = @{
         OriginalBackColor = $BackColor
         HoverColor = $HoverColor
     }
-    
+
     # Add hover effects
     $button.Add_MouseEnter({
         $this.BackColor = $this.Tag.HoverColor
@@ -115,7 +118,7 @@ function New-ModernButton {
     $button.Add_MouseLeave({
         $this.BackColor = $this.Tag.OriginalBackColor
     })
-    
+
     return $button
 }
 
@@ -126,14 +129,14 @@ function Show-StatusNotification {
         [string]$Message,
         [string]$Type = "Info" # Info, Success, Warning, Error
     )
-    
+
     $color = switch ($Type) {
         "Success" { $script:Win11Colors.Success }
         "Warning" { $script:Win11Colors.Warning }
         "Error" { $script:Win11Colors.Error }
         default { $script:Win11Colors.TextPrimary }
     }
-    
+
     $StatusLabel.Text = $Message
     $StatusLabel.ForeColor = $color
 }
@@ -149,7 +152,7 @@ function Show-ModernResultDialog {
         [int]$totalExpected,
         [array]$selectedPaths
     )
-    
+
     # Create the form
     $resultForm = New-Object System.Windows.Forms.Form
     $resultForm.Text = "Installation Complete"
@@ -159,7 +162,7 @@ function Show-ModernResultDialog {
     $resultForm.BackColor = $script:Win11Colors.Background
     $resultForm.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9)
     $resultForm.Padding = New-Object System.Windows.Forms.Padding(24)
-    
+
     # Main container
     $mainPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $mainPanel.Dock = [System.Windows.Forms.DockStyle]::Fill
@@ -169,13 +172,13 @@ function Show-ModernResultDialog {
     $mainPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent, 100))) | Out-Null
     $mainPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute, 60))) | Out-Null
     $resultForm.Controls.Add($mainPanel)
-    
+
     # Header section
     $headerPanel = New-Object System.Windows.Forms.Panel
     $headerPanel.Dock = [System.Windows.Forms.DockStyle]::Fill
     $headerPanel.BackColor = $script:Win11Colors.Background
     $mainPanel.Controls.Add($headerPanel, 0, 0)
-    
+
     # Single clean title
     $titleLabel = New-Object System.Windows.Forms.Label
     $titleLabel.Text = "Theme Installation Summary"
@@ -184,13 +187,13 @@ function Show-ModernResultDialog {
     $titleLabel.Location = New-Object System.Drawing.Point(0, 20)
     $titleLabel.AutoSize = $true
     $headerPanel.Controls.Add($titleLabel)
-    
+
     # Calculate installed count for content logic
     $installedCount = 0
     foreach ($version in $installedThemes.Keys) {
         $installedCount += $installedThemes[$version].Count
     }
-    
+
     # Content area with scroll
     $scrollPanel = New-Object System.Windows.Forms.Panel
     $scrollPanel.Dock = [System.Windows.Forms.DockStyle]::Fill
@@ -198,7 +201,7 @@ function Show-ModernResultDialog {
     $scrollPanel.AutoScroll = $true
     $scrollPanel.Padding = New-Object System.Windows.Forms.Padding(24)
     $mainPanel.Controls.Add($scrollPanel, 0, 1)
-    
+
     # Content container
     $contentPanel = New-Object System.Windows.Forms.FlowLayoutPanel
     $contentPanel.FlowDirection = [System.Windows.Forms.FlowDirection]::TopDown
@@ -206,9 +209,9 @@ function Show-ModernResultDialog {
     $contentPanel.AutoSize = $true
     $contentPanel.Width = 600
     $scrollPanel.Controls.Add($contentPanel)
-    
+
     $yPosition = 0
-    
+
     # Show newly installed themes
     if ($installedCount -gt 0) {
         $sectionLabel = New-Object System.Windows.Forms.Label
@@ -218,7 +221,7 @@ function Show-ModernResultDialog {
         $sectionLabel.AutoSize = $true
         $sectionLabel.Margin = New-Object System.Windows.Forms.Padding(0, 0, 0, 12)
         $contentPanel.Controls.Add($sectionLabel)
-        
+
         foreach ($version in $installedThemes.Keys) {
             # Version header
             $versionLabel = New-Object System.Windows.Forms.Label
@@ -228,7 +231,7 @@ function Show-ModernResultDialog {
             $versionLabel.AutoSize = $true
             $versionLabel.Margin = New-Object System.Windows.Forms.Padding(20, 8, 0, 4)
             $contentPanel.Controls.Add($versionLabel)
-            
+
             # Theme list for this version
             foreach ($theme in $installedThemes[$version]) {
                 $themeName = Get-FileNameWithoutExtension -FilePath $theme
@@ -236,7 +239,7 @@ function Show-ModernResultDialog {
                 $themePanel.Height = 24
                 $themePanel.Width = 560
                 $themePanel.Margin = New-Object System.Windows.Forms.Padding(40, 1, 0, 1)
-                
+
                 $themeLabel = New-Object System.Windows.Forms.Label
                 $themeLabel.Text = "- $themeName"
                 $themeLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9)
@@ -244,36 +247,36 @@ function Show-ModernResultDialog {
                 $themeLabel.AutoSize = $true
                 $themeLabel.Location = New-Object System.Drawing.Point(0, 2)
                 $themePanel.Controls.Add($themeLabel)
-                
+
                 # Background image status
                 if ($themeBackgroundStatus.ContainsKey("$version::$theme")) {
                     $statusLabel = New-Object System.Windows.Forms.Label
                     $statusLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 8)
                     $statusLabel.AutoSize = $true
                     $statusLabel.Location = New-Object System.Drawing.Point(300, 4)
-                    
+
                     switch ($themeBackgroundStatus["$version::$theme"]) {
-                        "installed" { 
+                        "installed" {
                             $statusLabel.Text = "(with background image)"
                             $statusLabel.ForeColor = $script:Win11Colors.Success
                         }
-                        "exists" { 
+                        "exists" {
                             $statusLabel.Text = "(background already exists)"
                             $statusLabel.ForeColor = $script:Win11Colors.TextSecondary
                         }
-                        "failed" { 
+                        "failed" {
                             $statusLabel.Text = "(no background image)"
                             $statusLabel.ForeColor = $script:Win11Colors.Warning
                         }
                     }
                     $themePanel.Controls.Add($statusLabel)
                 }
-                
+
                 $contentPanel.Controls.Add($themePanel)
             }
         }
     }
-    
+
     # Show already installed themes
     if ($totalAlreadyInstalled -gt 0) {
         if ($installedCount -gt 0) {
@@ -282,7 +285,7 @@ function Show-ModernResultDialog {
             $spacer.Width = 600
             $contentPanel.Controls.Add($spacer)
         }
-        
+
         $sectionLabel = New-Object System.Windows.Forms.Label
         $sectionLabel.Text = "ALREADY INSTALLED THEMES"
         $sectionLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Display", 12, [System.Drawing.FontStyle]::Bold)
@@ -290,7 +293,7 @@ function Show-ModernResultDialog {
         $sectionLabel.AutoSize = $true
         $sectionLabel.Margin = New-Object System.Windows.Forms.Padding(0, 0, 0, 12)
         $contentPanel.Controls.Add($sectionLabel)
-        
+
         foreach ($version in $alreadyInstalledThemes.Keys) {
             $versionLabel = New-Object System.Windows.Forms.Label
             $versionLabel.Text = "${version}:"
@@ -299,7 +302,7 @@ function Show-ModernResultDialog {
             $versionLabel.AutoSize = $true
             $versionLabel.Margin = New-Object System.Windows.Forms.Padding(20, 8, 0, 4)
             $contentPanel.Controls.Add($versionLabel)
-            
+
             foreach ($theme in $alreadyInstalledThemes[$version]) {
                 $themeName = Get-FileNameWithoutExtension -FilePath $theme
                 $themeLabel = New-Object System.Windows.Forms.Label
@@ -312,13 +315,13 @@ function Show-ModernResultDialog {
             }
         }
     }
-    
+
     # Installation paths section
     $spacer = New-Object System.Windows.Forms.Label
     $spacer.Height = 20
     $spacer.Width = 600
     $contentPanel.Controls.Add($spacer)
-    
+
     $pathsLabel = New-Object System.Windows.Forms.Label
     $pathsLabel.Text = "INSTALLATION PATHS"
     $pathsLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Display", 12, [System.Drawing.FontStyle]::Bold)
@@ -326,7 +329,7 @@ function Show-ModernResultDialog {
     $pathsLabel.AutoSize = $true
     $pathsLabel.Margin = New-Object System.Windows.Forms.Padding(0, 0, 0, 8)
     $contentPanel.Controls.Add($pathsLabel)
-    
+
     foreach ($path in $selectedPaths) {
         $versionName = if ($path -like "*preview*") { "Warp Preview" } else { "Warp" }
         $pathLabel = New-Object System.Windows.Forms.Label
@@ -337,14 +340,14 @@ function Show-ModernResultDialog {
         $pathLabel.Margin = New-Object System.Windows.Forms.Padding(20, 1, 0, 1)
         $contentPanel.Controls.Add($pathLabel)
     }
-    
+
     # Instructions
     if ($installedCount -gt 0) {
         $spacer = New-Object System.Windows.Forms.Label
         $spacer.Height = 16
         $spacer.Width = 600
         $contentPanel.Controls.Add($spacer)
-        
+
         $instructionLabel = New-Object System.Windows.Forms.Label
         $instructionLabel.Text = "TIP: To use your new themes, restart Warp and select them from Settings > Appearance > Themes"
         $instructionLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9, [System.Drawing.FontStyle]::Italic)
@@ -354,37 +357,37 @@ function Show-ModernResultDialog {
         $instructionLabel.Margin = New-Object System.Windows.Forms.Padding(20, 8, 0, 0)
         $contentPanel.Controls.Add($instructionLabel)
     }
-    
+
     # Button area
     $buttonPanel = New-Object System.Windows.Forms.Panel
     $buttonPanel.Dock = [System.Windows.Forms.DockStyle]::Fill
     $buttonPanel.BackColor = $script:Win11Colors.Background
     $mainPanel.Controls.Add($buttonPanel, 0, 2)
-    
+
     $okButton = New-ModernButton -Text "OK" -Width 120 -Height 36
     # Center the button horizontally: (652 - 120) / 2 = 266
     $okButton.Location = New-Object System.Drawing.Point(266, 12)
     $okButton.Add_Click({ $resultForm.Close() })
     $buttonPanel.Controls.Add($okButton)
-    
+
     $resultForm.ShowDialog() | Out-Null
 }
 
 # Install Themes Function with improved progress reporting
 function Install-Themes {
     param (
-        [array]$themes, 
+        [array]$themes,
         [bool]$isInstallAll,
         [System.Windows.Forms.Label]$statusLabel,
         [System.Windows.Forms.ProgressBar]$progressBar = $null
     )
-    
+
     $installedThemes = @{}
     $alreadyInstalledThemes = @{}
     $themeBackgroundStatus = @{}
     $totalOperations = $themes.Count * $global:selectedPaths.Count
     $currentOperation = 0
-    
+
     foreach ($installPath in $global:selectedPaths) {
         $versionName = if ($installPath -like "*preview*") { "Warp Preview" } else { "Warp" }
         Show-StatusNotification -StatusLabel $statusLabel -Message "Installing themes for $versionName..." -Type "Info"
@@ -397,7 +400,7 @@ function Install-Themes {
             if ($progressBar) {
                 $progressBar.Value = [math]::Min(100, [int](($currentOperation / $totalOperations) * 100))
             }
-            
+
             $destinationPath = "$installPath\$file"
             if (Test-Path $destinationPath) {
                 if (-not $alreadyInstalledThemes.ContainsKey($versionName)) {
@@ -413,23 +416,23 @@ function Install-Themes {
             foreach ($file in $notInstalledThemes) {
                 $themeName = Get-FileNameWithoutExtension -FilePath $file
                 Show-StatusNotification -StatusLabel $statusLabel -Message "Installing $themeName to $versionName..." -Type "Info"
-                
+
                 try {
                     $fileUrl = "$repoRawUrl/$file"
                     $destinationPath = "$installPath\$file"
                     Invoke-WebRequest -Uri $fileUrl -OutFile $destinationPath
-                    
+
                     if (-not $installedThemes.ContainsKey($versionName)) {
                         $installedThemes[$versionName] = @()
                     }
                     $installedThemes[$versionName] += $file
-                    
+
                     # Check for background image in the theme file
                     $themeContent = Get-Content -Path $destinationPath -Raw
                     if ($themeContent -match 'background_image:\s*\n\s*path:\s*["'']([^"'']+)["'']') {
                         $bgImageFile = $matches[1]
                         $bgImageDestination = "$installPath\$bgImageFile"
-                        
+
                         # Check if background image already exists
                         if (Test-Path $bgImageDestination) {
                             $themeBackgroundStatus["$versionName::$file"] = "exists"
@@ -453,15 +456,15 @@ function Install-Themes {
 
     # Build result message
     $message = ""
-    
+
     # Check if all themes are already installed in all versions
     $totalAlreadyInstalled = 0
     foreach ($version in $alreadyInstalledThemes.Keys) {
         $totalAlreadyInstalled += $alreadyInstalledThemes[$version].Count
     }
-    
+
     $totalExpected = $themes.Count * $global:selectedPaths.Count
-    
+
     if ($isInstallAll -and $totalAlreadyInstalled -eq $totalExpected) {
         $message = "All themes are already installed in selected version(s)!"
     } else {
@@ -470,16 +473,16 @@ function Install-Themes {
         foreach ($version in $installedThemes.Keys) {
             $installedCount += $installedThemes[$version].Count
         }
-        
+
         if ($installedCount -gt 0) {
             $message += "The following themes have been installed successfully:`n"
-            
+
             foreach ($version in $installedThemes.Keys) {
                 $message += "`n$version`:`n"
                 foreach ($theme in $installedThemes[$version]) {
                     $themeName = Get-FileNameWithoutExtension -FilePath $theme
                     $statusSuffix = ""
-                    
+
                     # Add background image status if applicable
                     if ($themeBackgroundStatus.ContainsKey("$version::$theme")) {
                         switch ($themeBackgroundStatus["$version::$theme"]) {
@@ -488,19 +491,19 @@ function Install-Themes {
                             "failed" { $statusSuffix = " (background image not found)" }
                         }
                     }
-                    
+
                     $message += "  - $themeName$statusSuffix`n"
                 }
             }
-            
+
             $message += "`nTo use them, restart Warp and select them from settings."
         }
-        
+
         # Add already installed themes to message
         if ($totalAlreadyInstalled -gt 0) {
             if ($message -ne "") { $message += "`n`n" }
             $message += "The following themes were already installed:`n"
-            
+
             foreach ($version in $alreadyInstalledThemes.Keys) {
                 $message += "`n$version`:`n"
                 foreach ($theme in $alreadyInstalledThemes[$version]) {
@@ -509,12 +512,12 @@ function Install-Themes {
                 }
             }
         }
-        
+
         if ($installedCount -eq 0 -and $totalAlreadyInstalled -eq 0) {
             $message = "No new themes were installed."
         }
     }
-    
+
     # Add installation paths
     $message += "`n`nInstallation paths:"
     foreach ($path in $global:selectedPaths) {
@@ -524,7 +527,7 @@ function Install-Themes {
 
     # Create a beautiful modern result dialog
     Show-ModernResultDialog -installedThemes $installedThemes -alreadyInstalledThemes $alreadyInstalledThemes -themeBackgroundStatus $themeBackgroundStatus -isInstallAll $isInstallAll -totalAlreadyInstalled $totalAlreadyInstalled -totalExpected $totalExpected -selectedPaths $global:selectedPaths
-    
+
     if ($progressBar) {
         $progressBar.Value = 0
     }
@@ -534,12 +537,10 @@ function Install-Themes {
 # Create combined GUI with Windows 11 design language
 function New-CombinedInstallerGUI {
     param ($themeFiles)
-    Add-Type -AssemblyName System.Windows.Forms
-    Add-Type -AssemblyName System.Drawing
 
     # Make the process DPI-aware
     Set-ProcessDPIAware
-    
+
     # Create the main form with Windows 11 styling
     $form = New-Object System.Windows.Forms.Form
     $form.Text = "Warp Theme Installer"
@@ -549,7 +550,7 @@ function New-CombinedInstallerGUI {
     $form.BackColor = $script:Win11Colors.Background
     $form.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9)
     $form.Padding = New-Object System.Windows.Forms.Padding(24)
-    
+
     # Main container with proper spacing
     $mainContainer = New-Object System.Windows.Forms.TableLayoutPanel
     $mainContainer.Dock = [System.Windows.Forms.DockStyle]::Fill
@@ -557,7 +558,7 @@ function New-CombinedInstallerGUI {
     $mainContainer.ColumnCount = 1
     $mainContainer.Padding = New-Object System.Windows.Forms.Padding(0)
     $mainContainer.Margin = New-Object System.Windows.Forms.Padding(0)
-    
+
     # Define row styles with Windows 11 spacing
     $mainContainer.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute, 80))) | Out-Null  # Header
     $mainContainer.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute, 100))) | Out-Null # Version selection
@@ -565,7 +566,7 @@ function New-CombinedInstallerGUI {
     $mainContainer.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent, 100))) | Out-Null  # Theme list
     $mainContainer.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute, 100))) | Out-Null # Actions and status
     $form.Controls.Add($mainContainer)
-    
+
     #
     # HEADER SECTION
     #
@@ -573,7 +574,7 @@ function New-CombinedInstallerGUI {
     $headerPanel.Dock = [System.Windows.Forms.DockStyle]::Fill
     $headerPanel.BackColor = $script:Win11Colors.Background
     $mainContainer.Controls.Add($headerPanel, 0, 0)
-    
+
     $titleLabel = New-Object System.Windows.Forms.Label
     $titleLabel.Text = "Warp Theme Installer"
     $titleLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Display", 20, [System.Drawing.FontStyle]::Bold)
@@ -581,7 +582,7 @@ function New-CombinedInstallerGUI {
     $titleLabel.Location = New-Object System.Drawing.Point(0, 12)
     $titleLabel.AutoSize = $true
     $headerPanel.Controls.Add($titleLabel)
-    
+
     $subtitleLabel = New-Object System.Windows.Forms.Label
     $subtitleLabel.Text = "Install custom themes for Warp terminal"
     $subtitleLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 10)
@@ -589,7 +590,7 @@ function New-CombinedInstallerGUI {
     $subtitleLabel.Location = New-Object System.Drawing.Point(0, 50)
     $subtitleLabel.AutoSize = $true
     $headerPanel.Controls.Add($subtitleLabel)
-    
+
     #
     # VERSION SELECTION SECTION
     #
@@ -599,7 +600,7 @@ function New-CombinedInstallerGUI {
     $versionCard.Padding = New-Object System.Windows.Forms.Padding(20)
     $versionCard.Margin = New-Object System.Windows.Forms.Padding(0, 0, 0, 16)
     $mainContainer.Controls.Add($versionCard, 0, 1)
-    
+
     $versionTitle = New-Object System.Windows.Forms.Label
     $versionTitle.Text = "Select Warp Version"
     $versionTitle.Font = New-Object System.Drawing.Font("Segoe UI Variable Display", 14, [System.Drawing.FontStyle]::Bold)
@@ -607,7 +608,7 @@ function New-CombinedInstallerGUI {
     $versionTitle.Location = New-Object System.Drawing.Point(0, 0)
     $versionTitle.AutoSize = $true
     $versionCard.Controls.Add($versionTitle)
-    
+
     # Radio button container
     $radioContainer = New-Object System.Windows.Forms.FlowLayoutPanel
     $radioContainer.Location = New-Object System.Drawing.Point(0, 35)
@@ -615,7 +616,7 @@ function New-CombinedInstallerGUI {
     $radioContainer.FlowDirection = [System.Windows.Forms.FlowDirection]::LeftToRight
     $radioContainer.WrapContents = $false
     $versionCard.Controls.Add($radioContainer)
-    
+
     # Modern radio buttons with auto-selection
     $radioWarp = New-Object System.Windows.Forms.RadioButton
     $radioWarp.Text = "Warp"
@@ -625,7 +626,7 @@ function New-CombinedInstallerGUI {
     $radioWarp.Checked = $true
     $radioWarp.Margin = New-Object System.Windows.Forms.Padding(0, 0, 40, 0)
     $radioContainer.Controls.Add($radioWarp)
-    
+
     $radioPreview = New-Object System.Windows.Forms.RadioButton
     $radioPreview.Text = "Warp Preview"
     $radioPreview.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 10)
@@ -633,14 +634,14 @@ function New-CombinedInstallerGUI {
     $radioPreview.AutoSize = $true
     $radioPreview.Margin = New-Object System.Windows.Forms.Padding(0, 0, 40, 0)
     $radioContainer.Controls.Add($radioPreview)
-    
+
     $radioBoth = New-Object System.Windows.Forms.RadioButton
     $radioBoth.Text = "Both Versions"
     $radioBoth.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 10)
     $radioBoth.ForeColor = $script:Win11Colors.TextPrimary
     $radioBoth.AutoSize = $true
     $radioContainer.Controls.Add($radioBoth)
-    
+
     # Auto-apply version selection function (MUST BE DEFINED BEFORE EVENT HANDLERS)
     $applyVersionSelection = {
         if ($radioWarp.Checked) {
@@ -653,21 +654,21 @@ function New-CombinedInstallerGUI {
             $global:selectedPaths = @($warpThemePath, $warpPreviewThemePath)
             $versionText = "Both Warp and Warp Preview"
         }
-        
+
         # Enable controls
         $checkedListBox.Enabled = $true
         $installSelectedButton.Enabled = $true
         $installAllButton.Enabled = $true
         $selectAllButton.Enabled = $true
-        
+
         Show-StatusNotification -StatusLabel $statusLabel -Message "Selected: $versionText. Choose themes to install." -Type "Success"
     }
-    
+
     # Add event handlers for automatic selection (AFTER FUNCTION IS DEFINED)
     $radioWarp.Add_CheckedChanged($applyVersionSelection)
     $radioPreview.Add_CheckedChanged($applyVersionSelection)
     $radioBoth.Add_CheckedChanged($applyVersionSelection)
-    
+
     #
     # THEME SECTION HEADER
     #
@@ -675,7 +676,7 @@ function New-CombinedInstallerGUI {
     $themeSectionPanel.Dock = [System.Windows.Forms.DockStyle]::Fill
     $themeSectionPanel.BackColor = $script:Win11Colors.Background
     $mainContainer.Controls.Add($themeSectionPanel, 0, 2)
-    
+
     $themeSectionTitle = New-Object System.Windows.Forms.Label
     $themeSectionTitle.Text = "Available Themes"
     $themeSectionTitle.Font = New-Object System.Drawing.Font("Segoe UI Variable Display", 14, [System.Drawing.FontStyle]::Bold)
@@ -683,7 +684,7 @@ function New-CombinedInstallerGUI {
     $themeSectionTitle.Location = New-Object System.Drawing.Point(0, 15)
     $themeSectionTitle.AutoSize = $true
     $themeSectionPanel.Controls.Add($themeSectionTitle)
-    
+
     #
     # THEME SELECTION AREA
     #
@@ -692,7 +693,7 @@ function New-CombinedInstallerGUI {
     $themeCard.BackColor = $script:Win11Colors.Surface
     $themeCard.Padding = New-Object System.Windows.Forms.Padding(20)
     $mainContainer.Controls.Add($themeCard, 0, 3)
-    
+
     # Theme list with modern styling
     $checkedListBox = New-Object System.Windows.Forms.CheckedListBox
     $checkedListBox.Dock = [System.Windows.Forms.DockStyle]::Fill
@@ -706,14 +707,14 @@ function New-CombinedInstallerGUI {
     $checkedListBox.BorderStyle = [System.Windows.Forms.BorderStyle]::None
     $checkedListBox.Enabled = $false
     $checkedListBox.IntegralHeight = $false
-    
+
     # Add themes to the list
-    $themeFiles | ForEach-Object { 
+    $themeFiles | ForEach-Object {
         $displayName = Get-FileNameWithoutExtension -FilePath $_
         $checkedListBox.Items.Add($displayName) | Out-Null
     }
     $themeCard.Controls.Add($checkedListBox)
-    
+
     #
     # ACTION AND STATUS SECTION
     #
@@ -722,7 +723,7 @@ function New-CombinedInstallerGUI {
     $actionCard.BackColor = $script:Win11Colors.Surface
     $actionCard.Padding = New-Object System.Windows.Forms.Padding(20)
     $mainContainer.Controls.Add($actionCard, 0, 4)
-    
+
     # Button panel
     $buttonPanel = New-Object System.Windows.Forms.FlowLayoutPanel
     $buttonPanel.Location = New-Object System.Drawing.Point(0, 0)
@@ -730,26 +731,26 @@ function New-CombinedInstallerGUI {
     $buttonPanel.FlowDirection = [System.Windows.Forms.FlowDirection]::LeftToRight
     $buttonPanel.WrapContents = $false
     $actionCard.Controls.Add($buttonPanel)
-    
+
     # Modern action buttons
     $installSelectedButton = New-ModernButton -Text "Install Selected" -Width 140
     $installSelectedButton.Enabled = $false
     $installSelectedButton.Margin = New-Object System.Windows.Forms.Padding(0, 0, 12, 0)
     $buttonPanel.Controls.Add($installSelectedButton)
-    
+
     $installAllButton = New-ModernButton -Text "Install All" -Width 140
     $installAllButton.Enabled = $false
     $installAllButton.Margin = New-Object System.Windows.Forms.Padding(0, 0, 12, 0)
     $buttonPanel.Controls.Add($installAllButton)
-    
+
     $selectAllButton = New-ModernButton -Text "Select All" -Width 120 -BackColor $script:Win11Colors.Secondary -ForeColor $script:Win11Colors.TextOnSecondary -HoverColor $script:Win11Colors.SecondaryHover -BorderColor $script:Win11Colors.BorderDark
     $selectAllButton.Enabled = $false
     $selectAllButton.Margin = New-Object System.Windows.Forms.Padding(0, 0, 12, 0)
     $buttonPanel.Controls.Add($selectAllButton)
-    
+
     $exitButton = New-ModernButton -Text "Exit" -Width 100 -BackColor $script:Win11Colors.Secondary -ForeColor $script:Win11Colors.TextOnSecondary -HoverColor $script:Win11Colors.SecondaryHover -BorderColor $script:Win11Colors.BorderDark
     $buttonPanel.Controls.Add($exitButton)
-    
+
     # Progress bar
     $progressBar = New-Object System.Windows.Forms.ProgressBar
     $progressBar.Location = New-Object System.Drawing.Point(0, 48)
@@ -757,7 +758,7 @@ function New-CombinedInstallerGUI {
     $progressBar.Style = [System.Windows.Forms.ProgressBarStyle]::Continuous
     $progressBar.Visible = $false
     $actionCard.Controls.Add($progressBar)
-    
+
     # Status label
     $statusLabel = New-Object System.Windows.Forms.Label
     $statusLabel.Text = "Ready to install themes. Select themes and click Install Selected or Install All."
@@ -767,14 +768,14 @@ function New-CombinedInstallerGUI {
     $statusLabel.ForeColor = $script:Win11Colors.TextSecondary
     $statusLabel.TextAlign = [System.Drawing.ContentAlignment]::MiddleLeft
     $actionCard.Controls.Add($statusLabel)
-    
+
     #
     # EVENT HANDLERS AND INITIALIZATION
     #
-    
+
     # Initialize with default selection (Warp is already checked)
     & $applyVersionSelection
-    
+
     # Select all themes
     $selectAllButton.Add_Click({
         for ($i = 0; $i -lt $checkedListBox.Items.Count; $i++) {
@@ -782,49 +783,49 @@ function New-CombinedInstallerGUI {
         }
         Show-StatusNotification -StatusLabel $statusLabel -Message "All themes selected." -Type "Info"
     })
-    
+
     # Install selected themes
     $installSelectedButton.Add_Click({
         if ($global:selectedPaths.Count -eq 0) {
             Show-StatusNotification -StatusLabel $statusLabel -Message "Error: No Warp version selected. Please select a version first." -Type "Error"
             return
         }
-        
+
         $selectedIndices = $checkedListBox.CheckedIndices
         if ($selectedIndices.Count -eq 0) {
             Show-StatusNotification -StatusLabel $statusLabel -Message "Error: No themes selected. Please select at least one theme." -Type "Error"
             return
         }
-        
+
         $selectedThemes = @()
         foreach ($index in $selectedIndices) {
             $selectedThemes += $themeFiles[$index]
         }
-        
+
         $progressBar.Visible = $true
         Ensure-DestinationDirectories
         Install-Themes -themes $selectedThemes -isInstallAll $false -statusLabel $statusLabel -progressBar $progressBar
         $progressBar.Visible = $false
     })
-    
+
     # Install all themes
     $installAllButton.Add_Click({
         if ($global:selectedPaths.Count -eq 0) {
             Show-StatusNotification -StatusLabel $statusLabel -Message "Error: No Warp version selected. Please select a version first." -Type "Error"
             return
         }
-        
+
         $progressBar.Visible = $true
         Ensure-DestinationDirectories
         Install-Themes -themes $themeFiles -isInstallAll $true -statusLabel $statusLabel -progressBar $progressBar
         $progressBar.Visible = $false
     })
-    
+
     # Exit
     $exitButton.Add_Click({
         $form.Close()
     })
-    
+
     # Show the form
     $form.ShowDialog()
 }
@@ -833,7 +834,7 @@ function New-CombinedInstallerGUI {
 try {
     # Get theme files
     $themeFiles = Get-ThemeFiles
-    
+
     # Launch the installer
     New-CombinedInstallerGUI -themeFiles $themeFiles
 } catch {
