@@ -1,8 +1,39 @@
 # Warp Theme Installer
+<#
+.SYNOPSIS
+    Installs custom themes for Warp terminal from GitHub repository.
+
+.DESCRIPTION
+    This script provides a graphical interface to download and install custom themes
+    for Warp and Warp Preview terminals. It features parallel downloads, error handling,
+    and automatic background image installation.
+
+.NOTES
+    Requires: PowerShell 5.1 or higher
+    Author: SilentGlasses
+    Repository: https://github.com/SilentGlasses/warp_themes
+#>
+
+# Check PowerShell version
+$requiredVersion = [version]"5.1"
+$currentVersion = $PSVersionTable.PSVersion
+
+if ($currentVersion -lt $requiredVersion) {
+    Write-Error "This script requires PowerShell $requiredVersion or higher. Current version: $currentVersion"
+    exit 1
+}
+
+if ($currentVersion.Major -eq 5) {
+    Write-Warning "You are using PowerShell 5.1. For better performance, consider upgrading to PowerShell 7+."
+    Start-Sleep -Seconds 2
+}
 
 # Load required assemblies early for PS 5.1 compatibility
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
+
+# Ensure TLS 1.2 or higher for secure connections
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12 -bor [System.Net.SecurityProtocolType]::Tls13
 
 # Define variables
 $repoRawUrl = "https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/yaml_files"
@@ -10,6 +41,21 @@ $backgroundsRawUrl = "https://raw.githubusercontent.com/SilentGlasses/warp_theme
 $repoApiUrl = "https://api.github.com/repos/SilentGlasses/warp_themes/contents/yaml_files"
 $warpThemePath = "${env:AppData}\warp\Warp\data\themes"
 $warpPreviewThemePath = "${env:AppData}\warp-preview\Warp\data\themes"
+
+# UI Constants
+$script:UIConstants = @{
+    CheckedListBoxColumnWidth = 280
+    CheckedListBoxItemHeight = 32
+    ButtonWidth = 120
+    ButtonHeight = 36
+    DefaultTimeout = 30  # seconds for web requests
+    MaxRetries = 3
+    MaxFileSize = 10MB   # Maximum file size for downloads
+    MaxImageSize = 5MB   # Maximum image file size
+}
+
+# Cache for API responses
+$script:ThemeFileCache = $null
 
 # Windows 11 color palette
 $script:Win11Colors = @{
@@ -31,9 +77,18 @@ $script:Win11Colors = @{
 }
 
 # To keep track of selected version
-$global:selectedPaths = @()
+$script:selectedPaths = @()
 
-# PowerShell 5.1 compatible function to get filename without extension
+<#
+.SYNOPSIS
+    Gets the filename without extension in a PowerShell 5.1 compatible way.
+
+.PARAMETER FilePath
+    The full path or filename to process.
+
+.OUTPUTS
+    String. The filename without its extension.
+#>
 function Get-FileNameWithoutExtension {
     param([string]$FilePath)
     $fileName = Split-Path $FilePath -Leaf
@@ -44,30 +99,252 @@ function Get-FileNameWithoutExtension {
     return $fileName
 }
 
-# Ensure the destination directories exist
-function Ensure-DestinationDirectories {
-    foreach ($path in $global:selectedPaths) {
-        if (-not (Test-Path $path)) {
-            $versionName = if ($path.Contains('preview')) { 'Warp Preview' } else { 'Warp' }
-            Write-Host "Creating theme directory for $versionName..."
-            New-Item -ItemType Directory -Path $path -Force | Out-Null
+<#
+.SYNOPSIS
+    Validates that a file path is safe and doesn't contain path traversal sequences.
+
+.PARAMETER FilePath
+    The file path to validate.
+
+.OUTPUTS
+    Boolean. True if the path is safe, False otherwise.
+#>
+function Test-SafeFilePath {
+    param([string]$FilePath)
+    
+    if ([string]::IsNullOrWhiteSpace($FilePath)) {
+        return $false
+    }
+    
+    # Check for path traversal sequences
+    if ($FilePath -match '\.\.[\\/]' -or $FilePath -match '[\\/]\.\.') {
+        Write-Warning "Path traversal detected in filename: $FilePath"
+        return $false
+    }
+    
+    # Check if path is rooted (absolute path)
+    if ([System.IO.Path]::IsPathRooted($FilePath)) {
+        Write-Warning "Absolute path detected in filename: $FilePath"
+        return $false
+    }
+    
+    # Check for invalid characters
+    $invalidChars = [System.IO.Path]::GetInvalidFileNameChars()
+    foreach ($char in $invalidChars) {
+        if ($FilePath.Contains($char)) {
+            Write-Warning "Invalid character detected in filename: $FilePath"
+            return $false
         }
     }
+    
+    return $true
 }
 
-# Get a list of YAML theme files from the repository
-function Get-ThemeFiles {
-    Write-Host "Fetching list of theme files..."
-    try {
-        $themeFilesResponse = Invoke-RestMethod -Uri $repoApiUrl
-        return $themeFilesResponse | Where-Object { $_.name -match "\.yaml$" } | ForEach-Object { $_.name }
-    } catch {
-        Write-Host "Error fetching theme files: $($_)"
-        exit 1
+<#
+.SYNOPSIS
+    Validates downloaded file size and type.
+
+.PARAMETER FilePath
+    Path to the downloaded file.
+
+.PARAMETER FileType
+    Expected file type: 'yaml' or 'image'.
+
+.OUTPUTS
+    Hashtable with Success (bool) and Message (string) keys.
+#>
+function Test-DownloadedFile {
+    param(
+        [string]$FilePath,
+        [string]$FileType
+    )
+    
+    $result = @{ Success = $true; Message = "" }
+    
+    if (-not (Test-Path $FilePath)) {
+        $result.Success = $false
+        $result.Message = "File not found: $FilePath"
+        return $result
     }
+    
+    # Check file size
+    $fileInfo = Get-Item $FilePath
+    $maxSize = if ($FileType -eq 'image') { $script:UIConstants.MaxImageSize } else { $script:UIConstants.MaxFileSize }
+    
+    if ($fileInfo.Length -gt $maxSize) {
+        $result.Success = $false
+        $result.Message = "File exceeds maximum size limit: $($fileInfo.Length) bytes (max: $maxSize bytes)"
+        return $result
+    }
+    
+    if ($fileInfo.Length -eq 0) {
+        $result.Success = $false
+        $result.Message = "Downloaded file is empty"
+        return $result
+    }
+    
+    # Validate file type
+    if ($FileType -eq 'yaml') {
+        try {
+            $content = Get-Content -Path $FilePath -Raw -ErrorAction Stop
+            if ([string]::IsNullOrWhiteSpace($content)) {
+                $result.Success = $false
+                $result.Message = "YAML file is empty or invalid"
+                return $result
+            }
+            # Basic YAML validation - check for common YAML patterns
+            if ($content -notmatch '[a-zA-Z_]+:') {
+                $result.Success = $false
+                $result.Message = "File does not appear to be valid YAML"
+                return $result
+            }
+        } catch {
+            $result.Success = $false
+            $result.Message = "Failed to read YAML file: $($_.Exception.Message)"
+            return $result
+        }
+    } elseif ($FileType -eq 'image') {
+        try {
+            # Check magic bytes for common image formats
+            $bytes = [System.IO.File]::ReadAllBytes($FilePath)
+            if ($bytes.Length -lt 4) {
+                $result.Success = $false
+                $result.Message = "File is too small to be a valid image"
+                return $result
+            }
+            
+            $isPng = ($bytes[0] -eq 0x89 -and $bytes[1] -eq 0x50 -and $bytes[2] -eq 0x4E -and $bytes[3] -eq 0x47)
+            $isJpg = ($bytes[0] -eq 0xFF -and $bytes[1] -eq 0xD8 -and $bytes[2] -eq 0xFF)
+            $isGif = ($bytes[0] -eq 0x47 -and $bytes[1] -eq 0x49 -and $bytes[2] -eq 0x46)
+            $isWebp = ($bytes[8] -eq 0x57 -and $bytes[9] -eq 0x45 -and $bytes[10] -eq 0x42 -and $bytes[11] -eq 0x50)
+            
+            if (-not ($isPng -or $isJpg -or $isGif -or $isWebp)) {
+                $result.Success = $false
+                $result.Message = "File does not appear to be a valid image (PNG, JPG, GIF, or WebP)"
+                return $result
+            }
+        } catch {
+            $result.Success = $false
+            $result.Message = "Failed to validate image file: $($_.Exception.Message)"
+            return $result
+        }
+    }
+    
+    return $result
 }
 
-# Function to make the process DPI-aware
+<#
+.SYNOPSIS
+    Ensures destination directories exist and are writable.
+
+.DESCRIPTION
+    Creates theme directories if they don't exist and validates write permissions.
+
+.OUTPUTS
+    Hashtable with Success (bool) and Message (string) keys.
+#>
+function Ensure-DestinationDirectories {
+    $result = @{ Success = $true; Message = "" }
+    
+    foreach ($path in $script:selectedPaths) {
+        $versionName = if ($path.Contains('preview')) { 'Warp Preview' } else { 'Warp' }
+        
+        # Create directory if it doesn't exist
+        if (-not (Test-Path $path)) {
+            Write-Host "Creating theme directory for $versionName..."
+            try {
+                New-Item -ItemType Directory -Path $path -Force -ErrorAction Stop | Out-Null
+            } catch {
+                $result.Success = $false
+                $result.Message = "Failed to create directory for ${versionName}: $($_.Exception.Message). Please check your permissions."
+                return $result
+            }
+        }
+        
+        # Validate write permissions
+        $testFile = Join-Path $path "_write_test_$(Get-Random).tmp"
+        try {
+            [System.IO.File]::WriteAllText($testFile, "test")
+        } catch {
+            $result.Success = $false
+            $result.Message = "No write permission for ${versionName} directory: $path. Please check your permissions or run as administrator."
+            return $result
+        } finally {
+            if (Test-Path $testFile) {
+                Remove-Item $testFile -Force -ErrorAction SilentlyContinue
+            }
+        }
+    }
+    
+    return $result
+}
+
+<#
+.SYNOPSIS
+    Gets a list of YAML theme files from the GitHub repository.
+
+.DESCRIPTION
+    Fetches the theme file list from GitHub API with timeout and error handling.
+    Results are cached to avoid redundant API calls.
+
+.OUTPUTS
+    Array of theme filenames.
+#>
+function Get-ThemeFiles {
+    # Return cached data if available
+    if ($null -ne $script:ThemeFileCache) {
+        Write-Host "Using cached theme file list..."
+        return $script:ThemeFileCache
+    }
+    
+    # Validate repository URL
+    if ($repoApiUrl -notmatch '^https://api\.github\.com/repos/SilentGlasses/warp_themes/') {
+        throw "Invalid repository URL detected. Security check failed."
+    }
+    
+    Write-Host "Fetching list of theme files from GitHub..."
+    
+    $maxRetries = $script:UIConstants.MaxRetries
+    $retryCount = 0
+    $lastError = $null
+    
+    while ($retryCount -lt $maxRetries) {
+        try {
+            $themeFilesResponse = Invoke-RestMethod -Uri $repoApiUrl -TimeoutSec $script:UIConstants.DefaultTimeout -ErrorAction Stop
+            $themeFiles = $themeFilesResponse | Where-Object { $_.name -match "\.yaml$" } | ForEach-Object { $_.name }
+            
+            if ($themeFiles.Count -eq 0) {
+                throw "No theme files found in repository."
+            }
+            
+            # Cache the results
+            $script:ThemeFileCache = $themeFiles
+            Write-Host "Successfully fetched $($themeFiles.Count) theme files."
+            return $themeFiles
+        } catch {
+            $lastError = $_
+            $retryCount++
+            
+            if ($retryCount -lt $maxRetries) {
+                $waitTime = [math]::Pow(2, $retryCount)  # Exponential backoff: 2, 4, 8 seconds
+                Write-Host "Failed to fetch theme files (attempt $retryCount/$maxRetries). Retrying in $waitTime seconds..."
+                Start-Sleep -Seconds $waitTime
+            }
+        }
+    }
+    
+    # All retries failed
+    $errorMessage = "Failed to fetch theme files after $maxRetries attempts. Please check your internet connection and try again.`n`nError details: $($lastError.Exception.Message)"
+    Write-Host $errorMessage
+    Add-Type -AssemblyName System.Windows.Forms
+    [System.Windows.Forms.MessageBox]::Show($errorMessage, "Network Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+    exit 1
+}
+
+<#
+.SYNOPSIS
+    Makes the process DPI-aware for proper scaling on high-DPI displays.
+#>
 function Set-ProcessDPIAware {
     Add-Type @"
     using System;
@@ -80,7 +357,34 @@ function Set-ProcessDPIAware {
     [DPIHelper]::SetProcessDPIAware() | Out-Null
 }
 
-# Create a modern Windows 11 style button
+<#
+.SYNOPSIS
+    Creates a modern Windows 11 style button.
+
+.PARAMETER Text
+    The text to display on the button.
+
+.PARAMETER BackColor
+    The background color of the button.
+
+.PARAMETER ForeColor
+    The text color of the button.
+
+.PARAMETER HoverColor
+    The background color when hovering over the button.
+
+.PARAMETER BorderColor
+    The border color of the button.
+
+.PARAMETER Width
+    The width of the button in pixels.
+
+.PARAMETER Height
+    The height of the button in pixels.
+
+.OUTPUTS
+    System.Windows.Forms.Button
+#>
 function New-ModernButton {
     param(
         [string]$Text,
@@ -88,8 +392,8 @@ function New-ModernButton {
         [System.Drawing.Color]$ForeColor = [System.Drawing.Color]::White,
         [System.Drawing.Color]$HoverColor = $script:Win11Colors.PrimaryHover,
         [System.Drawing.Color]$BorderColor = $script:Win11Colors.Border,
-        [int]$Width = 120,
-        [int]$Height = 36
+        [int]$Width = $script:UIConstants.ButtonWidth,
+        [int]$Height = $script:UIConstants.ButtonHeight
     )
 
     $button = New-Object System.Windows.Forms.Button
@@ -122,7 +426,19 @@ function New-ModernButton {
     return $button
 }
 
-# Show notification in status area instead of popup
+<#
+.SYNOPSIS
+    Shows a notification in the status area.
+
+.PARAMETER StatusLabel
+    The label control to update with the message.
+
+.PARAMETER Message
+    The message to display.
+
+.PARAMETER Type
+    The type of notification: Info, Success, Warning, or Error.
+#>
 function Show-StatusNotification {
     param(
         [System.Windows.Forms.Label]$StatusLabel,
@@ -141,7 +457,31 @@ function Show-StatusNotification {
     $StatusLabel.ForeColor = $color
 }
 
-# Create a beautiful modern result dialog
+<#
+.SYNOPSIS
+    Shows a modern result dialog after theme installation.
+
+.PARAMETER installedThemes
+    Hashtable of newly installed themes organized by version.
+
+.PARAMETER alreadyInstalledThemes
+    Hashtable of themes that were already installed.
+
+.PARAMETER themeBackgroundStatus
+    Hashtable tracking background image installation status.
+
+.PARAMETER isInstallAll
+    Boolean indicating if all themes were being installed.
+
+.PARAMETER totalAlreadyInstalled
+    Count of themes that were already installed.
+
+.PARAMETER totalExpected
+    Total number of themes expected to be installed.
+
+.PARAMETER selectedPaths
+    Array of installation paths.
+#>
 function Show-ModernResultDialog {
     param(
         [hashtable]$installedThemes,
@@ -150,7 +490,8 @@ function Show-ModernResultDialog {
         [bool]$isInstallAll,
         [int]$totalAlreadyInstalled,
         [int]$totalExpected,
-        [array]$selectedPaths
+        [array]$selectedPaths,
+        [array]$missingBackgrounds = @()
     )
 
     # Create the form
@@ -222,58 +563,110 @@ function Show-ModernResultDialog {
         $sectionLabel.Margin = New-Object System.Windows.Forms.Padding(0, 0, 0, 12)
         $contentPanel.Controls.Add($sectionLabel)
 
-        foreach ($version in $installedThemes.Keys) {
-            # Version header
-            $versionLabel = New-Object System.Windows.Forms.Label
-            $versionLabel.Text = "${version}:"
-            $versionLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 10, [System.Drawing.FontStyle]::Bold)
-            $versionLabel.ForeColor = $script:Win11Colors.Primary
-            $versionLabel.AutoSize = $true
-            $versionLabel.Margin = New-Object System.Windows.Forms.Padding(20, 8, 0, 4)
-            $contentPanel.Controls.Add($versionLabel)
+        # Create table header
+        $headerPanel = New-Object System.Windows.Forms.Panel
+        $headerPanel.Height = 28
+        $headerPanel.Width = 560
+        $headerPanel.Margin = New-Object System.Windows.Forms.Padding(20, 4, 0, 8)
+        
+        $nameHeader = New-Object System.Windows.Forms.Label
+        $nameHeader.Text = "Theme Name"
+        $nameHeader.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9, [System.Drawing.FontStyle]::Bold)
+        $nameHeader.ForeColor = $script:Win11Colors.TextPrimary
+        $nameHeader.AutoSize = $false
+        $nameHeader.Width = 200
+        $nameHeader.Location = New-Object System.Drawing.Point(0, 0)
+        $headerPanel.Controls.Add($nameHeader)
+        
+        $versionHeader = New-Object System.Windows.Forms.Label
+        $versionHeader.Text = "Warp Version"
+        $versionHeader.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9, [System.Drawing.FontStyle]::Bold)
+        $versionHeader.ForeColor = $script:Win11Colors.TextPrimary
+        $versionHeader.AutoSize = $false
+        $versionHeader.Width = 150
+        $versionHeader.Location = New-Object System.Drawing.Point(200, 0)
+        $headerPanel.Controls.Add($versionHeader)
+        
+        $bgHeader = New-Object System.Windows.Forms.Label
+        $bgHeader.Text = "Background"
+        $bgHeader.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9, [System.Drawing.FontStyle]::Bold)
+        $bgHeader.ForeColor = $script:Win11Colors.TextPrimary
+        $bgHeader.AutoSize = $false
+        $bgHeader.Width = 210
+        $bgHeader.Location = New-Object System.Drawing.Point(350, 0)
+        $headerPanel.Controls.Add($bgHeader)
+        
+        $contentPanel.Controls.Add($headerPanel)
 
-            # Theme list for this version
+        # Organize themes by name
+        $themesByName = @{}
+        foreach ($version in $installedThemes.Keys) {
             foreach ($theme in $installedThemes[$version]) {
                 $themeName = Get-FileNameWithoutExtension -FilePath $theme
-                $themePanel = New-Object System.Windows.Forms.Panel
-                $themePanel.Height = 24
-                $themePanel.Width = 560
-                $themePanel.Margin = New-Object System.Windows.Forms.Padding(40, 1, 0, 1)
-
-                $themeLabel = New-Object System.Windows.Forms.Label
-                $themeLabel.Text = "- $themeName"
-                $themeLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9)
-                $themeLabel.ForeColor = $script:Win11Colors.TextPrimary
-                $themeLabel.AutoSize = $true
-                $themeLabel.Location = New-Object System.Drawing.Point(0, 2)
-                $themePanel.Controls.Add($themeLabel)
-
-                # Background image status
-                if ($themeBackgroundStatus.ContainsKey("$version::$theme")) {
-                    $statusLabel = New-Object System.Windows.Forms.Label
-                    $statusLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 8)
-                    $statusLabel.AutoSize = $true
-                    $statusLabel.Location = New-Object System.Drawing.Point(300, 4)
-
-                    switch ($themeBackgroundStatus["$version::$theme"]) {
-                        "installed" {
-                            $statusLabel.Text = "(with background image)"
-                            $statusLabel.ForeColor = $script:Win11Colors.Success
-                        }
-                        "exists" {
-                            $statusLabel.Text = "(background already exists)"
-                            $statusLabel.ForeColor = $script:Win11Colors.TextSecondary
-                        }
-                        "failed" {
-                            $statusLabel.Text = "(no background image)"
-                            $statusLabel.ForeColor = $script:Win11Colors.Warning
-                        }
+                if (-not $themesByName.ContainsKey($themeName)) {
+                    $themesByName[$themeName] = @{
+                        Versions = @()
+                        BackgroundStatus = @{}
                     }
-                    $themePanel.Controls.Add($statusLabel)
                 }
-
-                $contentPanel.Controls.Add($themePanel)
+                $themesByName[$themeName].Versions += $version
+                if ($themeBackgroundStatus.ContainsKey("$version::$theme")) {
+                    $themesByName[$themeName].BackgroundStatus[$version] = $themeBackgroundStatus["$version::$theme"]
+                }
             }
+        }
+
+        # Display themes sorted by name
+        foreach ($themeName in ($themesByName.Keys | Sort-Object)) {
+            $themePanel = New-Object System.Windows.Forms.Panel
+            $themePanel.Height = 24
+            $themePanel.Width = 560
+            $themePanel.Margin = New-Object System.Windows.Forms.Padding(20, 1, 0, 1)
+
+            $themeLabel = New-Object System.Windows.Forms.Label
+            $themeLabel.Text = $themeName
+            $themeLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9)
+            $themeLabel.ForeColor = $script:Win11Colors.TextPrimary
+            $themeLabel.AutoSize = $false
+            $themeLabel.Width = 200
+            $themeLabel.Location = New-Object System.Drawing.Point(0, 2)
+            $themePanel.Controls.Add($themeLabel)
+
+            # Version info
+            $versionText = if ($themesByName[$themeName].Versions.Count -eq 2) { "Both" } else { $themesByName[$themeName].Versions[0] }
+            $versionLabel = New-Object System.Windows.Forms.Label
+            $versionLabel.Text = $versionText
+            $versionLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9)
+            $versionLabel.ForeColor = $script:Win11Colors.TextPrimary
+            $versionLabel.AutoSize = $false
+            $versionLabel.Width = 150
+            $versionLabel.Location = New-Object System.Drawing.Point(200, 2)
+            $themePanel.Controls.Add($versionLabel)
+
+            # Background status - determine unified status
+            $bgStatusLabel = New-Object System.Windows.Forms.Label
+            $bgStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9)
+            $bgStatusLabel.AutoSize = $false
+            $bgStatusLabel.Width = 210
+            $bgStatusLabel.Location = New-Object System.Drawing.Point(350, 2)
+
+            $statuses = $themesByName[$themeName].BackgroundStatus.Values | Select-Object -Unique
+            if ($statuses.Count -eq 0 -or ($statuses.Count -eq 1 -and $statuses[0] -eq $null)) {
+                $bgStatusLabel.Text = "No Background"
+                $bgStatusLabel.ForeColor = $script:Win11Colors.TextSecondary
+            } elseif ($statuses -contains "installed") {
+                $bgStatusLabel.Text = "Background Installed"
+                $bgStatusLabel.ForeColor = $script:Win11Colors.Success
+            } elseif ($statuses -contains "exists") {
+                $bgStatusLabel.Text = "Background Already Exists"
+                $bgStatusLabel.ForeColor = $script:Win11Colors.TextSecondary
+            } else {
+                $bgStatusLabel.Text = "Background Not Found"
+                $bgStatusLabel.ForeColor = $script:Win11Colors.Warning
+            }
+            $themePanel.Controls.Add($bgStatusLabel)
+
+            $contentPanel.Controls.Add($themePanel)
         }
     }
 
@@ -294,25 +687,91 @@ function Show-ModernResultDialog {
         $sectionLabel.Margin = New-Object System.Windows.Forms.Padding(0, 0, 0, 12)
         $contentPanel.Controls.Add($sectionLabel)
 
-        foreach ($version in $alreadyInstalledThemes.Keys) {
-            $versionLabel = New-Object System.Windows.Forms.Label
-            $versionLabel.Text = "${version}:"
-            $versionLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 10, [System.Drawing.FontStyle]::Bold)
-            $versionLabel.ForeColor = $script:Win11Colors.Primary
-            $versionLabel.AutoSize = $true
-            $versionLabel.Margin = New-Object System.Windows.Forms.Padding(20, 8, 0, 4)
-            $contentPanel.Controls.Add($versionLabel)
+        # Create table header
+        $headerPanel = New-Object System.Windows.Forms.Panel
+        $headerPanel.Height = 28
+        $headerPanel.Width = 560
+        $headerPanel.Margin = New-Object System.Windows.Forms.Padding(20, 4, 0, 8)
+        
+        $nameHeader = New-Object System.Windows.Forms.Label
+        $nameHeader.Text = "Theme Name"
+        $nameHeader.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9, [System.Drawing.FontStyle]::Bold)
+        $nameHeader.ForeColor = $script:Win11Colors.TextSecondary
+        $nameHeader.AutoSize = $false
+        $nameHeader.Width = 200
+        $nameHeader.Location = New-Object System.Drawing.Point(0, 0)
+        $headerPanel.Controls.Add($nameHeader)
+        
+        $versionHeader = New-Object System.Windows.Forms.Label
+        $versionHeader.Text = "Warp Version"
+        $versionHeader.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9, [System.Drawing.FontStyle]::Bold)
+        $versionHeader.ForeColor = $script:Win11Colors.TextSecondary
+        $versionHeader.AutoSize = $false
+        $versionHeader.Width = 150
+        $versionHeader.Location = New-Object System.Drawing.Point(200, 0)
+        $headerPanel.Controls.Add($versionHeader)
+        
+        $bgHeader = New-Object System.Windows.Forms.Label
+        $bgHeader.Text = "Background"
+        $bgHeader.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9, [System.Drawing.FontStyle]::Bold)
+        $bgHeader.ForeColor = $script:Win11Colors.TextSecondary
+        $bgHeader.AutoSize = $false
+        $bgHeader.Width = 210
+        $bgHeader.Location = New-Object System.Drawing.Point(350, 0)
+        $headerPanel.Controls.Add($bgHeader)
+        
+        $contentPanel.Controls.Add($headerPanel)
 
+        # Organize themes by name
+        $themesByName = @{}
+        foreach ($version in $alreadyInstalledThemes.Keys) {
             foreach ($theme in $alreadyInstalledThemes[$version]) {
                 $themeName = Get-FileNameWithoutExtension -FilePath $theme
-                $themeLabel = New-Object System.Windows.Forms.Label
-                $themeLabel.Text = "- $themeName"
-                $themeLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9)
-                $themeLabel.ForeColor = $script:Win11Colors.TextSecondary
-                $themeLabel.AutoSize = $true
-                $themeLabel.Margin = New-Object System.Windows.Forms.Padding(40, 1, 0, 1)
-                $contentPanel.Controls.Add($themeLabel)
+                if (-not $themesByName.ContainsKey($themeName)) {
+                    $themesByName[$themeName] = @()
+                }
+                $themesByName[$themeName] += $version
             }
+        }
+
+        # Display themes sorted by name
+        foreach ($themeName in ($themesByName.Keys | Sort-Object)) {
+            $themePanel = New-Object System.Windows.Forms.Panel
+            $themePanel.Height = 24
+            $themePanel.Width = 560
+            $themePanel.Margin = New-Object System.Windows.Forms.Padding(20, 1, 0, 1)
+
+            $themeLabel = New-Object System.Windows.Forms.Label
+            $themeLabel.Text = $themeName
+            $themeLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9)
+            $themeLabel.ForeColor = $script:Win11Colors.TextSecondary
+            $themeLabel.AutoSize = $false
+            $themeLabel.Width = 200
+            $themeLabel.Location = New-Object System.Drawing.Point(0, 2)
+            $themePanel.Controls.Add($themeLabel)
+
+            # Version info
+            $versionText = if ($themesByName[$themeName].Count -eq 2) { "Both" } else { $themesByName[$themeName][0] }
+            $versionLabel = New-Object System.Windows.Forms.Label
+            $versionLabel.Text = $versionText
+            $versionLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9)
+            $versionLabel.ForeColor = $script:Win11Colors.TextSecondary
+            $versionLabel.AutoSize = $false
+            $versionLabel.Width = 150
+            $versionLabel.Location = New-Object System.Drawing.Point(200, 2)
+            $themePanel.Controls.Add($versionLabel)
+
+            # Background status (not tracked for already installed themes)
+            $bgStatusLabel = New-Object System.Windows.Forms.Label
+            $bgStatusLabel.Text = "-"
+            $bgStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9)
+            $bgStatusLabel.ForeColor = $script:Win11Colors.TextSecondary
+            $bgStatusLabel.AutoSize = $false
+            $bgStatusLabel.Width = 210
+            $bgStatusLabel.Location = New-Object System.Drawing.Point(350, 2)
+            $themePanel.Controls.Add($bgStatusLabel)
+
+            $contentPanel.Controls.Add($themePanel)
         }
     }
 
@@ -341,6 +800,33 @@ function Show-ModernResultDialog {
         $contentPanel.Controls.Add($pathLabel)
     }
 
+    # Missing backgrounds section
+    if ($missingBackgrounds.Count -gt 0) {
+        $spacer = New-Object System.Windows.Forms.Label
+        $spacer.Height = 20
+        $spacer.Width = 600
+        $contentPanel.Controls.Add($spacer)
+
+        $missingBgSectionLabel = New-Object System.Windows.Forms.Label
+        $missingBgSectionLabel.Text = "MISSING BACKGROUNDS"
+        $missingBgSectionLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Display", 12, [System.Drawing.FontStyle]::Bold)
+        $missingBgSectionLabel.ForeColor = $script:Win11Colors.Warning
+        $missingBgSectionLabel.AutoSize = $true
+        $missingBgSectionLabel.Margin = New-Object System.Windows.Forms.Padding(0, 0, 0, 12)
+        $contentPanel.Controls.Add($missingBgSectionLabel)
+
+        foreach ($bgInfo in $missingBackgrounds) {
+            $bgLabel = New-Object System.Windows.Forms.Label
+            $bgLabel.Text = "- $($bgInfo.ThemeName) ($($bgInfo.Version)): $($bgInfo.BackgroundFile)"
+            $bgLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9)
+            $bgLabel.ForeColor = $script:Win11Colors.TextSecondary
+            $bgLabel.AutoSize = $true
+            $bgLabel.MaximumSize = New-Object System.Drawing.Size(560, 0)
+            $bgLabel.Margin = New-Object System.Windows.Forms.Padding(20, 1, 0, 1)
+            $contentPanel.Controls.Add($bgLabel)
+        }
+    }
+
     # Instructions
     if ($installedCount -gt 0) {
         $spacer = New-Object System.Windows.Forms.Label
@@ -349,7 +835,7 @@ function Show-ModernResultDialog {
         $contentPanel.Controls.Add($spacer)
 
         $instructionLabel = New-Object System.Windows.Forms.Label
-        $instructionLabel.Text = "TIP: To use your new themes, restart Warp and select them from Settings > Appearance > Themes"
+        $instructionLabel.Text = "TIP: To use your new themes, restart Warp and select them from Settings - Appearance - Themes"
         $instructionLabel.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9, [System.Drawing.FontStyle]::Italic)
         $instructionLabel.ForeColor = $script:Win11Colors.Primary
         $instructionLabel.AutoSize = $true
@@ -373,7 +859,26 @@ function Show-ModernResultDialog {
     $resultForm.ShowDialog() | Out-Null
 }
 
-# Install Themes Function with improved progress reporting
+<#
+.SYNOPSIS
+    Downloads and installs theme files with parallel processing.
+
+.DESCRIPTION
+    Downloads theme files and their background images from GitHub repository
+    with timeout handling, retry logic, and parallel downloads for better performance.
+
+.PARAMETER themes
+    Array of theme filenames to install.
+
+.PARAMETER isInstallAll
+    Boolean indicating if all themes are being installed.
+
+.PARAMETER statusLabel
+    Label control for displaying status messages.
+
+.PARAMETER progressBar
+    Optional progress bar control for visual feedback.
+#>
 function Install-Themes {
     param (
         [array]$themes,
@@ -385,10 +890,11 @@ function Install-Themes {
     $installedThemes = @{}
     $alreadyInstalledThemes = @{}
     $themeBackgroundStatus = @{}
-    $totalOperations = $themes.Count * $global:selectedPaths.Count
+    $missingBackgrounds = @()
+    $totalOperations = $themes.Count * $script:selectedPaths.Count
     $currentOperation = 0
 
-    foreach ($installPath in $global:selectedPaths) {
+    foreach ($installPath in $script:selectedPaths) {
         $versionName = if ($installPath -like "*preview*") { "Warp Preview" } else { "Warp" }
         Show-StatusNotification -StatusLabel $statusLabel -Message "Installing themes for $versionName..." -Type "Info"
 
@@ -413,42 +919,244 @@ function Install-Themes {
         }
 
         if ($notInstalledThemes.Count -gt 0) {
-            foreach ($file in $notInstalledThemes) {
-                $themeName = Get-FileNameWithoutExtension -FilePath $file
-                Show-StatusNotification -StatusLabel $statusLabel -Message "Installing $themeName to $versionName..." -Type "Info"
-
-                try {
+            Show-StatusNotification -StatusLabel $statusLabel -Message "Downloading $($notInstalledThemes.Count) themes for $versionName..." -Type "Info"
+            
+            # Use parallel downloads for PowerShell 7+ or sequential for PS 5.1
+            $useParallel = $PSVersionTable.PSVersion.Major -ge 7 -and $notInstalledThemes.Count -gt 1
+            
+            if ($useParallel) {
+                # PowerShell 7+ parallel processing
+                $downloadResults = $notInstalledThemes | ForEach-Object -Parallel {
+                    $file = $_
+                    $repoRawUrl = $using:repoRawUrl
+                    $backgroundsRawUrl = $using:backgroundsRawUrl
+                    $installPath = $using:installPath
+                    $timeout = $using:script:UIConstants.DefaultTimeout
+                    $maxRetries = $using:script:UIConstants.MaxRetries
+                    
+                    $result = @{
+                        File = $file
+                        Success = $false
+                        Error = $null
+                        BackgroundStatus = $null
+                        BackgroundFile = $null
+                    }
+                    
+                    # Download theme file with retry
                     $fileUrl = "$repoRawUrl/$file"
                     $destinationPath = "$installPath\$file"
-                    Invoke-WebRequest -Uri $fileUrl -OutFile $destinationPath
-
+                    $retryCount = 0
+                    
+                    while ($retryCount -lt $maxRetries) {
+                        try {
+                            Invoke-WebRequest -Uri $fileUrl -OutFile $destinationPath -TimeoutSec $timeout -ErrorAction Stop
+                            
+                            # Validate downloaded file
+                            $validation = Test-DownloadedFile -FilePath $destinationPath -FileType 'yaml'
+                            if (-not $validation.Success) {
+                                Remove-Item $destinationPath -Force -ErrorAction SilentlyContinue
+                                throw $validation.Message
+                            }
+                            
+                            $result.Success = $true
+                            break
+                        } catch {
+                            $retryCount++
+                            if ($retryCount -ge $maxRetries) {
+                                $result.Error = $_.Exception.Message
+                            } else {
+                                Start-Sleep -Seconds ([math]::Pow(2, $retryCount))
+                            }
+                        }
+                    }
+                    
+                    # Check for background image if theme downloaded successfully
+                    if ($result.Success) {
+                        $themeContent = Get-Content -Path $destinationPath -Raw
+                        if ($themeContent -match 'background_image:\s*\r?\n\s*path:\s*["'']([^"'']+)["'']') {
+                            $bgImageFile = $matches[1]
+                            
+                            # Validate background image path
+                            if (-not (Test-SafeFilePath -FilePath $bgImageFile)) {
+                                Write-Warning "Skipping unsafe background path: $bgImageFile"
+                                continue
+                            }
+                            
+                            $result.BackgroundFile = $bgImageFile
+                            $bgImageDestination = "$installPath\$bgImageFile"
+                            
+                            if (Test-Path $bgImageDestination) {
+                                $result.BackgroundStatus = "exists"
+                            } else {
+                                $bgImageUrl = "$backgroundsRawUrl/$bgImageFile"
+                                $bgRetryCount = 0
+                                
+                                while ($bgRetryCount -lt $maxRetries) {
+                                    try {
+                                        Invoke-WebRequest -Uri $bgImageUrl -OutFile $bgImageDestination -TimeoutSec $timeout -ErrorAction Stop
+                                        
+                                        # Validate downloaded image
+                                        $bgValidation = Test-DownloadedFile -FilePath $bgImageDestination -FileType 'image'
+                                        if (-not $bgValidation.Success) {
+                                            Remove-Item $bgImageDestination -Force -ErrorAction SilentlyContinue
+                                            throw $bgValidation.Message
+                                        }
+                                        
+                                        $result.BackgroundStatus = "installed"
+                                        break
+                                    } catch {
+                                        $bgRetryCount++
+                                        if ($bgRetryCount -ge $maxRetries) {
+                                            $result.BackgroundStatus = "failed"
+                                        } else {
+                                            Start-Sleep -Seconds ([math]::Pow(2, $bgRetryCount))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    return $result
+                } -ThrottleLimit 5
+                
+                # Process results
+                foreach ($result in $downloadResults) {
+                    $currentOperation++
+                    if ($progressBar) {
+                        $progressBar.Value = [math]::Min(100, [int](($currentOperation / $totalOperations) * 100))
+                    }
+                    
+                    if ($result.Success) {
+                        if (-not $installedThemes.ContainsKey($versionName)) {
+                            $installedThemes[$versionName] = @()
+                        }
+                        $installedThemes[$versionName] += $result.File
+                        
+                        if ($result.BackgroundStatus) {
+                            $themeBackgroundStatus["$versionName::$($result.File)"] = $result.BackgroundStatus
+                            # Track missing backgrounds
+                            if ($result.BackgroundStatus -eq "failed" -and $result.BackgroundFile) {
+                                $themeName = Get-FileNameWithoutExtension -FilePath $result.File
+                                $missingBackgrounds += @{
+                                    ThemeName = $themeName
+                                    Version = $versionName
+                                    BackgroundFile = $result.BackgroundFile
+                                }
+                            }
+                        }
+                    } else {
+                        $themeName = Get-FileNameWithoutExtension -FilePath $result.File
+                        Show-StatusNotification -StatusLabel $statusLabel -Message "Failed to install $themeName`: $($result.Error)" -Type "Error"
+                    }
+                }
+            } else {
+                # Sequential processing for PowerShell 5.1
+                foreach ($file in $notInstalledThemes) {
+                    $currentOperation++
+                    if ($progressBar) {
+                        $progressBar.Value = [math]::Min(100, [int](($currentOperation / $totalOperations) * 100))
+                    }
+                    
+                    $themeName = Get-FileNameWithoutExtension -FilePath $file
+                    Show-StatusNotification -StatusLabel $statusLabel -Message "Installing $themeName to $versionName..." -Type "Info"
+                    
+                    # Download theme file with retry
+                    $fileUrl = "$repoRawUrl/$file"
+                    $destinationPath = "$installPath\$file"
+                    $retryCount = 0
+                    $downloadSuccess = $false
+                    $lastError = $null
+                    
+                    while ($retryCount -lt $script:UIConstants.MaxRetries) {
+                        try {
+                            Invoke-WebRequest -Uri $fileUrl -OutFile $destinationPath -TimeoutSec $script:UIConstants.DefaultTimeout -ErrorAction Stop
+                            
+                            # Validate downloaded file
+                            $validation = Test-DownloadedFile -FilePath $destinationPath -FileType 'yaml'
+                            if (-not $validation.Success) {
+                                Remove-Item $destinationPath -Force -ErrorAction SilentlyContinue
+                                $lastError = [Exception]::new($validation.Message)
+                                throw $lastError
+                            }
+                            
+                            $downloadSuccess = $true
+                            break
+                        } catch {
+                            $lastError = $_
+                            $retryCount++
+                            if ($retryCount -lt $script:UIConstants.MaxRetries) {
+                                $waitTime = [math]::Pow(2, $retryCount)
+                                Write-Host "Download failed (attempt $retryCount/$($script:UIConstants.MaxRetries)). Retrying in $waitTime seconds..."
+                                Start-Sleep -Seconds $waitTime
+                            }
+                        }
+                    }
+                    
+                    if (-not $downloadSuccess) {
+                        Show-StatusNotification -StatusLabel $statusLabel -Message "Failed to download $themeName after $($script:UIConstants.MaxRetries) attempts: $($lastError.Exception.Message)" -Type "Error"
+                        continue
+                    }
+                    
                     if (-not $installedThemes.ContainsKey($versionName)) {
                         $installedThemes[$versionName] = @()
                     }
                     $installedThemes[$versionName] += $file
-
+                    
                     # Check for background image in the theme file
                     $themeContent = Get-Content -Path $destinationPath -Raw
-                    if ($themeContent -match 'background_image:\s*\n\s*path:\s*["'']([^"'']+)["'']') {
+                    if ($themeContent -match 'background_image:\s*\r?\n\s*path:\s*["'']([^"'']+)["'']') {
                         $bgImageFile = $matches[1]
+                        
+                        # Validate background image path
+                        if (-not (Test-SafeFilePath -FilePath $bgImageFile)) {
+                            Write-Warning "Skipping unsafe background path for ${themeName}: $bgImageFile"
+                            continue
+                        }
+                        
                         $bgImageDestination = "$installPath\$bgImageFile"
-
+                        
                         # Check if background image already exists
                         if (Test-Path $bgImageDestination) {
                             $themeBackgroundStatus["$versionName::$file"] = "exists"
                         } else {
-                            try {
-                                $bgImageUrl = "$backgroundsRawUrl/$bgImageFile"
-                                Invoke-WebRequest -Uri $bgImageUrl -OutFile $bgImageDestination -ErrorAction Stop
-                                $themeBackgroundStatus["$versionName::$file"] = "installed"
-                            } catch {
+                            $bgImageUrl = "$backgroundsRawUrl/$bgImageFile"
+                            $bgRetryCount = 0
+                            $bgDownloadSuccess = $false
+                            
+                            while ($bgRetryCount -lt $script:UIConstants.MaxRetries) {
+                                try {
+                                    Invoke-WebRequest -Uri $bgImageUrl -OutFile $bgImageDestination -TimeoutSec $script:UIConstants.DefaultTimeout -ErrorAction Stop
+                                    
+                                    # Validate downloaded image
+                                    $bgValidation = Test-DownloadedFile -FilePath $bgImageDestination -FileType 'image'
+                                    if (-not $bgValidation.Success) {
+                                        Remove-Item $bgImageDestination -Force -ErrorAction SilentlyContinue
+                                        throw $bgValidation.Message
+                                    }
+                                    
+                                    $themeBackgroundStatus["$versionName::$file"] = "installed"
+                                    $bgDownloadSuccess = $true
+                                    break
+                                } catch {
+                                    $bgRetryCount++
+                                    if ($bgRetryCount -lt $script:UIConstants.MaxRetries) {
+                                        Start-Sleep -Seconds ([math]::Pow(2, $bgRetryCount))
+                                    }
+                                }
+                            }
+                            
+                            if (-not $bgDownloadSuccess) {
                                 $themeBackgroundStatus["$versionName::$file"] = "failed"
-                                Write-Host "Warning: Could not download background image for $themeName in $versionName`: $($_.Exception.Message)"
+                                # Track missing backgrounds
+                                $missingBackgrounds += @{
+                                    ThemeName = $themeName
+                                    Version = $versionName
+                                    BackgroundFile = $bgImageFile
+                                }
                             }
                         }
                     }
-                } catch {
-                    Show-StatusNotification -StatusLabel $statusLabel -Message "Error installing $themeName for $versionName`: $($_.Exception.Message)" -Type "Error"
                 }
             }
         }
@@ -463,7 +1171,7 @@ function Install-Themes {
         $totalAlreadyInstalled += $alreadyInstalledThemes[$version].Count
     }
 
-    $totalExpected = $themes.Count * $global:selectedPaths.Count
+    $totalExpected = $themes.Count * $script:selectedPaths.Count
 
     if ($isInstallAll -and $totalAlreadyInstalled -eq $totalExpected) {
         $message = "All themes are already installed in selected version(s)!"
@@ -520,13 +1228,13 @@ function Install-Themes {
 
     # Add installation paths
     $message += "`n`nInstallation paths:"
-    foreach ($path in $global:selectedPaths) {
+    foreach ($path in $script:selectedPaths) {
         $versionName = if ($path -like "*preview*") { "Warp Preview" } else { "Warp" }
         $message += "`n  - $versionName`: $path"
     }
 
     # Create a beautiful modern result dialog
-    Show-ModernResultDialog -installedThemes $installedThemes -alreadyInstalledThemes $alreadyInstalledThemes -themeBackgroundStatus $themeBackgroundStatus -isInstallAll $isInstallAll -totalAlreadyInstalled $totalAlreadyInstalled -totalExpected $totalExpected -selectedPaths $global:selectedPaths
+    Show-ModernResultDialog -installedThemes $installedThemes -alreadyInstalledThemes $alreadyInstalledThemes -themeBackgroundStatus $themeBackgroundStatus -isInstallAll $isInstallAll -totalAlreadyInstalled $totalAlreadyInstalled -totalExpected $totalExpected -selectedPaths $script:selectedPaths -missingBackgrounds $missingBackgrounds
 
     if ($progressBar) {
         $progressBar.Value = 0
@@ -534,7 +1242,13 @@ function Install-Themes {
     Show-StatusNotification -StatusLabel $statusLabel -Message "Installation completed." -Type "Success"
 }
 
-# Create combined GUI with Windows 11 design language
+<#
+.SYNOPSIS
+    Creates the main installer GUI with Windows 11 design language.
+
+.PARAMETER themeFiles
+    Array of theme filenames to display in the interface.
+#>
 function New-CombinedInstallerGUI {
     param ($themeFiles)
 
@@ -645,13 +1359,13 @@ function New-CombinedInstallerGUI {
     # Auto-apply version selection function (MUST BE DEFINED BEFORE EVENT HANDLERS)
     $applyVersionSelection = {
         if ($radioWarp.Checked) {
-            $global:selectedPaths = @($warpThemePath)
+            $script:selectedPaths = @($warpThemePath)
             $versionText = "Warp"
         } elseif ($radioPreview.Checked) {
-            $global:selectedPaths = @($warpPreviewThemePath)
+            $script:selectedPaths = @($warpPreviewThemePath)
             $versionText = "Warp Preview"
         } elseif ($radioBoth.Checked) {
-            $global:selectedPaths = @($warpThemePath, $warpPreviewThemePath)
+            $script:selectedPaths = @($warpThemePath, $warpPreviewThemePath)
             $versionText = "Both Warp and Warp Preview"
         }
 
@@ -699,9 +1413,9 @@ function New-CombinedInstallerGUI {
     $checkedListBox.Dock = [System.Windows.Forms.DockStyle]::Fill
     $checkedListBox.CheckOnClick = $true
     $checkedListBox.MultiColumn = $true
-    $checkedListBox.ColumnWidth = 280
+    $checkedListBox.ColumnWidth = $script:UIConstants.CheckedListBoxColumnWidth
     $checkedListBox.Font = New-Object System.Drawing.Font("Segoe UI Variable Text", 9)
-    $checkedListBox.ItemHeight = 32
+    $checkedListBox.ItemHeight = $script:UIConstants.CheckedListBoxItemHeight
     $checkedListBox.BackColor = $script:Win11Colors.Surface
     $checkedListBox.ForeColor = $script:Win11Colors.TextPrimary
     $checkedListBox.BorderStyle = [System.Windows.Forms.BorderStyle]::None
@@ -786,7 +1500,7 @@ function New-CombinedInstallerGUI {
 
     # Install selected themes
     $installSelectedButton.Add_Click({
-        if ($global:selectedPaths.Count -eq 0) {
+        if ($script:selectedPaths.Count -eq 0) {
             Show-StatusNotification -StatusLabel $statusLabel -Message "Error: No Warp version selected. Please select a version first." -Type "Error"
             return
         }
@@ -803,20 +1517,30 @@ function New-CombinedInstallerGUI {
         }
 
         $progressBar.Visible = $true
-        Ensure-DestinationDirectories
+        $validation = Ensure-DestinationDirectories
+        if (-not $validation.Success) {
+            Show-StatusNotification -StatusLabel $statusLabel -Message $validation.Message -Type "Error"
+            $progressBar.Visible = $false
+            return
+        }
         Install-Themes -themes $selectedThemes -isInstallAll $false -statusLabel $statusLabel -progressBar $progressBar
         $progressBar.Visible = $false
     })
 
     # Install all themes
     $installAllButton.Add_Click({
-        if ($global:selectedPaths.Count -eq 0) {
+        if ($script:selectedPaths.Count -eq 0) {
             Show-StatusNotification -StatusLabel $statusLabel -Message "Error: No Warp version selected. Please select a version first." -Type "Error"
             return
         }
 
         $progressBar.Visible = $true
-        Ensure-DestinationDirectories
+        $validation = Ensure-DestinationDirectories
+        if (-not $validation.Success) {
+            Show-StatusNotification -StatusLabel $statusLabel -Message $validation.Message -Type "Error"
+            $progressBar.Visible = $false
+            return
+        }
         Install-Themes -themes $themeFiles -isInstallAll $true -statusLabel $statusLabel -progressBar $progressBar
         $progressBar.Visible = $false
     })
@@ -839,6 +1563,7 @@ try {
     New-CombinedInstallerGUI -themeFiles $themeFiles
 } catch {
     Add-Type -AssemblyName System.Windows.Forms
-    [System.Windows.Forms.MessageBox]::Show("Error: $($_.Exception.Message)", "Error")
+    $errorMsg = "Error: $($_.Exception.Message)"
+    [System.Windows.Forms.MessageBox]::Show($errorMsg, "Error")
     exit 1
 }

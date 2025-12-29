@@ -1,0 +1,26 @@
+# Ukiyo Night
+# Author: SilentGlasses
+name: Ukiyo Night
+accent: "#a7c7b7"
+background: "#0f1b1e"
+foreground: "#d8e1dc"
+details: "darker"
+terminal_colors:
+  normal:
+    black: "#0f1b1e"
+    red: "#9e3d3f"
+    green: "#5f7f6a"
+    yellow: "#b08a3e"
+    blue: "#2f5d73"
+    magenta: "#6e4f79"
+    cyan: "#4f7f7a"
+    white: "#cfd8d3"
+  bright:
+    black: "#1a2a2d"
+    red: "#c55454"
+    green: "#7fa38a"
+    yellow: "#d6b45c"
+    blue: "#4f86a1"
+    magenta: "#9a6fb0"
+    cyan: "#6fb1aa"
+    white: "#f1f5f3"
