@@ -193,6 +193,14 @@ Some themes include background images that will be automatically installed by th
 
 <img src="./screenshots/taken_will.png" alt="Taken Will" width="850">
 
+### Ukiyo Day
+
+<img src="./screenshots/ukiyo_light.png" alt="Ukiyo Day" width="850">
+
+### Ukiyo Night
+
+<img src="./screenshots/ukiyo_night.png" alt="Ukiyo Night" width="850">
+
 ### Vintage Dark
 
 <img src="./screenshots/vintage_dark.png" alt="Vintage Dark" width="850">
