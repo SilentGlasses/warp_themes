@@ -1,0 +1,26 @@
+# Ukiyo Day
+# Author: SilentGlasses
+name: Ukiyo Day
+accent: "#3a6f7a"
+background: "#f4f1ea"
+foreground: "#2a2f2e"
+details: "lighter"
+terminal_colors:
+  normal:
+    black: "#2a2f2e"
+    red: "#a2433d"
+    green: "#6b8f71"
+    yellow: "#b89b4a"
+    blue: "#3a6f8f"
+    magenta: "#7b5a8f"
+    cyan: "#5f8f8a"
+    white: "#e8e5dc"
+  bright:
+    black: "#4a504e"
+    red: "#c05a52"
+    green: "#89b39a"
+    yellow: "#d9c37a"
+    blue: "#5f93b8"
+    magenta: "#a47fc2"
+    cyan: "#7fc2bb"
+    white: "#ffffff"
