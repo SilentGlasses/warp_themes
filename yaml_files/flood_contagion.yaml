@@ -1,0 +1,33 @@
+# FLOOD CONTAGION Warp Theme
+# Author: SilentGlasses
+name: Flood Contagion
+details: "darker"
+accent: "#6FA3A6"
+background: "#14110E"
+cursor: "#D6E2D9"
+foreground: "#E6E1D6"
+selection: "#2A2621"
+background_image:
+  path: 'flood_contagion.jpg'
+  opacity: 20
+
+terminal_colors:
+  normal:
+    black:   "#14110E"
+    red:     "#7C2F2A"
+    green:   "#6E7F4A"
+    yellow:  "#9A8A4A"
+    blue:    "#4A6B70"
+    magenta: "#6A4A5E"
+    cyan:    "#5E7F82"
+    white:   "#E6E1D6"
+
+  bright:
+    black:   "#2A2621"
+    red:     "#A84740"
+    green:   "#8FA05E"
+    yellow:  "#C2B66A"
+    blue:    "#6FA3A6"
+    magenta: "#8C6A82"
+    cyan:    "#8FB7BA"
+    white:   "#FFFFFF"
