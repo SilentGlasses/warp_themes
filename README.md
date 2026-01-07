@@ -46,7 +46,7 @@ bash <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/
 > Execution policies are not a security boundary to restrict users; they are meant to prevent accidental script execution.
 >
 > The following options are allowed for the bypass should you want to adjust it to a different level:
-> 
+>
 > - **Restricted**: No scripts are allowed to run (default).
 > - **RemoteSigned**: Local scripts run without a signature; remote scripts require a digital signature.
 > - **Unrestricted**: All scripts can run, but you'll get a warning for unsigned scripts.
@@ -84,6 +84,10 @@ I use the following on both my mac and Linux machines:
 ## Themes with backgrounds
 
 Some themes include background images that will be automatically installed by the script. The installer checks for the `background_image.path` field in each theme YAML file and downloads the corresponding image from the repository's backgrounds directory.
+
+## Flood Contagion
+
+<img src="./screenshots/flood_contagion.png" alt="Flood Contagion" width="850">
 
 ### Liquid Glass Dark
 
