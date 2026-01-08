@@ -7,6 +7,7 @@ background: "#0A120F"
 foreground: "#B4EBC7"
 background_image:
   path: 'dark_strand.png'
+  
 terminal_colors:
   normal:
     black: "#0A120F"

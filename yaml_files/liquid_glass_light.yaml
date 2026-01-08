@@ -8,6 +8,7 @@ foreground: "#1C1E21"
 background_image:
   path: 'liquid_glass_light.png'
   opacity: 70
+
 terminal_colors:
   normal:
     black:   "#000000"

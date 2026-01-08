@@ -1,10 +1,11 @@
 # Nord Light Warp Theme
 # Author: SilentGlasses
 name: Nord Light
+details: "darker"
 accent: "#e5e9f0"
 background: "#e5e9f0"
-details: "darker"
 foreground: "#424959"
+
 terminal_colors:
   bright:
     black: "#3b4252"

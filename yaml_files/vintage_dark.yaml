@@ -1,10 +1,11 @@
 # Vintage Dark Warp Theme
 # Author: SilentGlasses
 name: Vintage Dark
+details: "darker"
 accent: "#FF948A"
 background: "#31363F"
-details: "darker"
 foreground: "#F7EFDC"
+
 terminal_colors:
   bright:
     black: "#222831"

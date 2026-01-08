@@ -1,10 +1,11 @@
 # Sad Bat Warp Theme
 # Author: SilentGlasses
 name: Sad Bat
+details: "darker"
 accent: "#F8F805"
 background: "#2A2C2E"
-details: "darker"
-foreground: "#4A5575"
+foreground: "#4A5575
+
 terminal_colors:
   bright:
     black: "#191919"
