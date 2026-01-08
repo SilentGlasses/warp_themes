@@ -81,13 +81,27 @@ I use the following on both my mac and Linux machines:
     - [Get my config here](https://github.com/SilentGlasses/fastfetch_config)
 - [Download a Nerd Font here](https://www.nerdfonts.com/font-downloads)
 
+---
+
 ## Themes with backgrounds
 
 Some themes include background images that will be automatically installed by the script. The installer checks for the `background_image.path` field in each theme YAML file and downloads the corresponding image from the repository's backgrounds directory.
 
+## Covenant Glass Night
+
+<img src="./screenshots/covenant_glass_night.png" alt="Covenant Glass Night" width="850">
+
+### Ethereal Galaxy Dark
+
+<img src="./screenshots/ethereal_galaxy_dark.png" alt="Ethereal Galaxy Dark" width="850">
+
 ## Flood Contagion
 
 <img src="./screenshots/flood_contagion.png" alt="Flood Contagion" width="850">
+
+## Kasumi Night
+
+<img src="./screenshots/kasumi_night.png" alt="Kasumi Night" width="850">
 
 ### Liquid Glass Dark
 
@@ -111,9 +125,11 @@ Some themes include background images that will be automatically installed by th
 
 <img src="./screenshots/strand_dark.png" alt="Strand Dark" width="850">
 
-### Ethereal Galaxy Dark
+## Ukiyo Night
 
-<img src="./screenshots/ethereal_galaxy_dark.png" alt="Ethereal Galaxy Dark" width="850">
+<img src="./screenshots/ukiyo_night.png" alt="Ukiyo Night" width="850">
+
+---
 
 ## Themes with no backgrounds
 
