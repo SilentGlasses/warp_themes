@@ -1,10 +1,11 @@
 # Retro Green Warp Theme
 # Author: SilentGlasses
 name: Retro Green
+details: "darker"
 accent: "#1ed174"
 background: "#13241b"
-details: "darker"
 foreground: "#1ed174"
+
 terminal_colors:
   bright:
     black: "#183024"

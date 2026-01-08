@@ -1,10 +1,11 @@
 # Neon Nights Warp Theme
 # Author: SilentGlasses
 name: Neon Nights
+details: "darker"
 accent: "#fc399a"
 background: "#231f20"
-details: "darker"
 foreground: "#e5e9f0"
+
 terminal_colors:
   bright:
     black: "#090909"

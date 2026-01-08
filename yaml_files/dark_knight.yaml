@@ -1,10 +1,11 @@
 # Dark Knight Warp Theme
 # Author: SilentGlasses
 name: Dark Knight
+details: "darker"
 accent: "#d26937"
 background: "#0c1014"
-details: "darker"
 foreground: "#99d1ce"
+
 terminal_colors:
   bright:
     black: "#091f2e"

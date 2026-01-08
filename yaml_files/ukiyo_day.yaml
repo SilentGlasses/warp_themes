@@ -1,10 +1,11 @@
 # Ukiyo Day
 # Author: SilentGlasses
 name: Ukiyo Day
+details: "lighter"
 accent: "#3a6f7a"
 background: "#f4f1ea"
 foreground: "#2a2f2e"
-details: "lighter"
+
 terminal_colors:
   normal:
     black: "#2a2f2e"

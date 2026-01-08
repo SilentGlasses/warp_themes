@@ -1,10 +1,11 @@
 # Kali Blue Warp Theme
 # Author: SilentGlasses
 name: Kali Blue
+details: "darker"
 accent: "#b4faff"
 background: "#151c24"
-details: "darker"
 foreground: "#92d3d8"
+
 terminal_colors:
   bright:
     black: "#010305"

@@ -1,10 +1,11 @@
 # Mjolnir Warp Theme
 # Author: SilentGlasses
 name: Mjolnir Warp
+details: "darker"
 accent: "#efb82a"
 background: "#2c2e2a"
-details: "darker"
 foreground: "#cdcfcc"
+
 terminal_colors:
   bright:
     black: "#0d090d"

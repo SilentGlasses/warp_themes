@@ -1,10 +1,11 @@
 # Pride Dark Warp Theme
 # Author: SilentGlasses
 name: Pride Dark
+details: "darker"
 accent: "#ff4583"
 background: "#231f1f"
-details: "darker"
 foreground: "#ffa8c5"
+
 terminal_colors:
   bright:
     black: "#7b4d33"

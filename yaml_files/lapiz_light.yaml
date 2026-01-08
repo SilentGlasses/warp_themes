@@ -1,10 +1,11 @@
 # Lapiz Light Warp Theme
 # Author: SilentGlasses
 name: Lapiz Light
+details: "lighter"
 accent: "#008ec4"
 background: "#f1f1f1"
-details: "lighter"
 foreground: "#424242"
+
 terminal_colors:
   bright:
     black: "#212121"
@@ -24,6 +25,3 @@ terminal_colors:
     magenta: "#523c79"
     cyan: "#20a5ba"
     white: "#e0e0e0"
-
-
-

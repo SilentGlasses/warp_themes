@@ -1,10 +1,11 @@
 # Matrix Dark Warp Theme
 # Author: SilentGlasses
 name: Matrix Dark
+details: "darker"
 accent: "#c1ff8a"
 background: "#0f191c"
-details: "darker"
 foreground: "#c1ff8a"
+
 terminal_colors:
   bright:
     black: "#0f191c"

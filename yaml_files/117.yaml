@@ -5,6 +5,7 @@ details: "darker"
 accent: "#976A14"
 background: "#161616"
 foreground: "#F9FCF0"
+
 terminal_colors:
   bright:
     black: "#1B121A"

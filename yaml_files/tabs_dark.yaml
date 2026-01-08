@@ -1,10 +1,11 @@
 # Tabs Dark Warp Theme
 # Author: SilentGlasses
 name: Tabs Dark
+details: "darker"
 accent: "#00c0ff"
 background: "#2a2a2a"
-details: "darker"
 foreground: "#fefefe"
+
 terminal_colors:
   bright:
     black: "#000000"
