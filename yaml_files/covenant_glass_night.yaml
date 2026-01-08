@@ -1,0 +1,32 @@
+# Covenant Glass Night Warp Theme
+# Author: SilentGlasses
+name: Covenant Glass Night
+details: "darker"
+accent: "#8a5cff"
+background: "#090b10"
+cursor: "#9fbfff"
+foreground: "#e4e8f0"
+selection: "#1a1c2a"
+background_image:
+  path: 'covenant_glass.png'
+  opacity: 20
+
+terminal_colors:
+  normal:
+    black:   "#090b10"
+    red:     "#7f3a6b"
+    green:   "#3a6b8f"
+    yellow:  "#8f7fb3"
+    blue:    "#4f78d4"
+    magenta: "#8a5cff"
+    cyan:    "#5fbfff"
+    white:   "#cad2e1"
+  bright:
+    black:   "#1a1c2a"
+    red:     "#aa5a8f"
+    green:   "#5f8fbf"
+    yellow:  "#b3a3da"
+    blue:    "#6f99e8"
+    magenta: "#aa7fff"
+    cyan:    "#7fd4ff"
+    white:   "#ffffff"

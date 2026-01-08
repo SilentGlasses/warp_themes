@@ -1,10 +1,11 @@
-# Ukiyo Night
+# Ukiyo Night Warp Theme
 # Author: SilentGlasses
 name: Ukiyo Night
+details: "darker"
 accent: "#a7c7b7"
 background: "#0f1b1e"
 foreground: "#d8e1dc"
-details: "darker"
+
 terminal_colors:
   normal:
     black: "#0f1b1e"

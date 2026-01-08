@@ -1,0 +1,32 @@
+# Kasumi Night Warp Theme
+# Author: SilentGlasses
+name: Kasumi Night
+details: "darker"
+accent: "#5f8a8a"
+background: "#121617"
+cursor: "#8fb3ad"
+foreground: "#d6dad7"
+selection: "#1f2b2c"
+background_image:
+  path: 'kasumi_night.png'
+  opacity: 20
+
+terminal_colors:
+  normal:
+    black:   "#121617"
+    red:     "#8f3e3e"
+    green:   "#5f7c74"
+    yellow:  "#9a8a4a"
+    blue:    "#3f6272"
+    magenta: "#6b5a7a"
+    cyan:    "#5f8a8a"
+    white:   "#cfd4d1"
+  bright:
+    black:   "#1e2425"
+    red:     "#b35a5a"
+    green:   "#7fa59b"
+    yellow:  "#c4b36a"
+    blue:    "#5f8aa3"
+    magenta: "#9073ad"
+    cyan:    "#7fbfb8"
+    white:   "#f2f4f3"
