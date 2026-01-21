@@ -1,0 +1,29 @@
+# Mandarin Warp Theme
+# Author: mindtnv
+name: Mandarin
+details: "darker"
+accent: "#FF8C00"
+background: "#1a1a1a"
+cursor: "#FFA500"
+foreground: "#e8e8e8"
+selection: "#3d3d3d"
+
+terminal_colors:
+  normal:
+    black:   "#1a1a1a"
+    red:     "#D35100"
+    green:   "#5a9a5a"
+    yellow:  "#FF8C00"
+    blue:    "#5a8ac0"
+    magenta: "#a05a90"
+    cyan:    "#5a9aaa"
+    white:   "#e8e8e8"
+  bright:
+    black:   "#3d3d3d"
+    red:     "#FF6B35"
+    green:   "#7ac07a"
+    yellow:  "#FFA500"
+    blue:    "#7ab0e0"
+    magenta: "#c07ab0"
+    cyan:    "#7ac0d0"
+    white:   "#ffffff"
