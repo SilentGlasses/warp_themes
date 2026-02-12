@@ -1,0 +1,29 @@
+# Mandarin OLED Warp Theme
+# Author: mindtnv
+name: Mandarin OLED
+details: "darker"
+accent: "#F07900"
+background: "#000000"
+cursor: "#F8A145"
+foreground: "#f0f0f0"
+selection: "#151515"
+
+terminal_colors:
+  normal:
+    black:   "#000000"
+    red:     "#D35100"
+    green:   "#5a9a5a"
+    yellow:  "#F07900"
+    blue:    "#5a8ac0"
+    magenta: "#a05a90"
+    cyan:    "#5a9aaa"
+    white:   "#f0f0f0"
+  bright:
+    black:   "#252525"
+    red:     "#FF6B35"
+    green:   "#7ac07a"
+    yellow:  "#F8A145"
+    blue:    "#7ab0e0"
+    magenta: "#c07ab0"
+    cyan:    "#7ac0d0"
+    white:   "#ffffff"
