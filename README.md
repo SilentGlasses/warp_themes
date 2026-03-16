@@ -7,9 +7,9 @@ If you want to get Warp, download it from [here](https://app.warp.dev/referral/2
 This project includes easy-to-use scripts that automates the installation of Warp themes from this repository. The script fetches available theme files directly from the repository and installs them to the correct location on your system based on your operating system.
 
 >[!NOTE]
-> **The Liquid Glass themes only work well on MacOS**
-> They call for a background but there is none. This is the only way I could get the right background transparency effect.
-> **PLEASE** DISREGARD THE `Could not download background image` warning.
+> - **The Liquid Glass themes only work well on MacOS**
+> - They call for a background but there is none. This is the only way I could get the right background transparency effect.
+> - **PLEASE** disregard the `Could not download background image` warning.
 
 ## Features:
 
