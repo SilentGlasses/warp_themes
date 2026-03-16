@@ -257,11 +257,23 @@ install_theme() {
 
     if [[ -f "$bg_destination" ]]; then
       background_installed="exists"
-    elif retry_curl "$bg_url" "$bg_destination"; then
-      background_installed="installed"
     else
-      background_installed="failed"
-      echo -e "${YELLOW}Warning: Could not download background image for $theme_name${NC}"
+      # Perform silent availability check via HEAD request
+      if curl -sI "$bg_url" | grep -q "200 OK"; then
+        if retry_curl "$bg_url" "$bg_destination"; then
+          background_installed="installed"
+        fi
+      else
+        # Asset missing on remote: generate local 1x1 transparent PNG fallback
+        echo -e "${BLUE}Generating transparent fallback for $theme_name...${NC}"
+        local b64="iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+        if command -v base64 >/dev/null; then
+          echo "$b64" | base64 -d > "$bg_destination" 2>/dev/null
+        else
+          python3 -c "import base64; open('$bg_destination', 'wb').write(base64.b64decode('$b64'))" 2>/dev/null
+        fi
+        background_installed="generated"
+      fi
     fi
   fi
 
@@ -311,7 +323,16 @@ echo -e "\n${BLUE}Installation Summary:${NC}"
 if [[ -n "$installed_themes" ]]; then
   echo -e "${GREEN}✓ Installed themes:${NC}"
   echo -e "$installed_themes" | grep -v '^$' | while IFS='=' read -r key value; do
-    echo "    - $value"
+    # Match the background status for this theme key
+    bg_stat=$(echo -e "$background_status" | grep "^${key}=" | cut -d'=' -f2)
+    case "$bg_stat" in
+      installed) display=" (with background image)" ;;
+      exists)    display=" (background image already exists)" ;;
+      generated) display=" (background image generated locally)" ;;
+      failed)    display=" (background image not found)" ;;
+      *)         display="" ;;
+    esac
+    echo "    - ${value}${display}"
   done
 fi
 
