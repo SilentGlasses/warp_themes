@@ -8,6 +8,8 @@ This project includes easy-to-use scripts that automates the installation of War
 
 >[!NOTE]
 > **The Liquid Glass themes only work well on MacOS**
+> They call for a background but there is none. This is the only way I could get the right background transparency effect.
+> **PLEASE** DISREGARD THE `Could not download background image` warning.
 
 ## Features:
 
@@ -106,14 +108,14 @@ Some themes include background images that will be automatically installed by th
 ### Liquid Glass Dark
 
 >[!NOTE]
-> **This theme only works well on MacOS**. It calls for a background but there is non. This is the only way I could get the right background transparency effect.
+> **This theme only works well on MacOS**. It calls for a background but there is none. This is the only way I could get the right background transparency effect.
 
 <img src="./screenshots/liquid_glass_dark.png" alt="Liquid Glass Dark" width="850">
 
 ### Liquid Glass Light
 
 >[!NOTE]
-> **This theme only works well on MacOS**. It calls for a background but there is non. This is the only way I could get the right background transparency effect.
+> **This theme only works well on MacOS**. It calls for a background but there is none. This is the only way I could get the right background transparency effect.
 
 <img src="./screenshots/liquid_glass_light.png" alt="Liquid Glass Light" width="850">
 
