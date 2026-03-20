@@ -6,7 +6,7 @@ accent: "#00c2ff"
 background: "#FFFFFF"
 foreground: "#1C1E21"
 background_image:
-  path: 'liquid_glass_light.png'
+  path: 'transparent.png'
   opacity: 70
 
 terminal_colors:

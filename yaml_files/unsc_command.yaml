@@ -1,0 +1,29 @@
+# UNSC COMMAND Warp Theme
+# Author: SilentGlasses
+name: UNSC Command
+details: "darker"
+accent: "#4DA6FF"
+background: "#0B1620"
+cursor: "#A9C7E8"
+foreground: "#DCE7F2"
+selection: "#1E344A"
+
+terminal_colors:
+  normal:
+    black: "#0B1620"
+    red: "#C94A4A"
+    green: "#4CAF50"
+    yellow: "#D6B65C"
+    blue: "#4DA6FF"
+    magenta: "#8C6FD1"
+    cyan: "#4FB3B3"
+    white: "#DCE7F2"
+  bright:
+    black: "#1C2A36"
+    red: "#E57373"
+    green: "#81C784"
+    yellow: "#FFD54F"
+    blue: "#82B8FF"
+    magenta: "#B39DDB"
+    cyan: "#80DEEA"
+    white: "#FFFFFF"

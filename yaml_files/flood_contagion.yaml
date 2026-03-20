@@ -9,7 +9,7 @@ foreground: "#E6E1D6"
 selection: "#2A2621"
 background_image:
   path: 'flood_contagion.jpg'
-  opacity: 20
+  opacity: 10
 
 terminal_colors:
   normal:

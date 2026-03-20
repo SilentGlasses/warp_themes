@@ -1,0 +1,29 @@
+# Pumpkin Spice Ember Warp Theme
+# Author: SilentGlasses
+name: Pumpkin Spice Ember
+details: "darker"
+accent: "#ff8a2a"
+background: "#1b0f08"
+cursor: "#ffb86a"
+foreground: "#f6efe8"
+selection: "#3b1f12"
+
+terminal_colors:
+  normal:
+    black:   "#1b0f08"
+    red:     "#b3471e"
+    green:   "#8f4a22"
+    yellow:  "#c96a2c"
+    blue:    "#a3562a"
+    magenta: "#7a3a1c"
+    cyan:    "#d47a3a"
+    white:   "#e2cfc0"
+  bright:
+    black:   "#3b1f12"
+    red:     "#e0602c"
+    green:   "#b35f2f"
+    yellow:  "#ff9a3c"
+    blue:    "#c46a34"
+    magenta: "#a24f26"
+    cyan:    "#ffb06a"
+    white:   "#ffffff"

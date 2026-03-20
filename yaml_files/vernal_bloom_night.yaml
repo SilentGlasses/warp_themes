@@ -1,0 +1,29 @@
+# Spring Bloom Night Warp Theme
+# Author: SilentGlasses
+name: Spring Bloom Night
+details: "darker"
+accent: "#7fd38a"
+background: "#0f1a14"
+cursor: "#b6f2c2"
+foreground: "#eaf6ee"
+selection: "#22382c"
+
+terminal_colors:
+  normal:
+    black:   "#0f1a14"
+    red:     "#d96c7b"
+    green:   "#6fbf8f"
+    yellow:  "#d9c77a"
+    blue:    "#7fb6d9"
+    magenta: "#c28fd9"
+    cyan:    "#6fd0c8"
+    white:   "#dbeee2"
+  bright:
+    black:   "#22382c"
+    red:     "#f08a96"
+    green:   "#8fddb0"
+    yellow:  "#f0e19a"
+    blue:    "#9fd0f0"
+    magenta: "#ddb0f0"
+    cyan:    "#8ff0e6"
+    white:   "#ffffff"

@@ -1,0 +1,29 @@
+# Solar Tide Day Warp Theme
+# Author: SilentGlasses
+name: Solar Tide Day
+details: "lighter"
+accent: "#f4b942"
+background: "#f5fbff"
+cursor: "#d49a2a"
+foreground: "#1f3442"
+selection: "#d6ecf7"
+
+terminal_colors:
+  normal:
+    black:   "#1f3442"
+    red:     "#e86a4f"
+    green:   "#6fbf93"
+    yellow:  "#e6b84f"
+    blue:    "#5f9fc9"
+    magenta: "#b07fc9"
+    cyan:    "#5fbfb6"
+    white:   "#eef6fb"
+  bright:
+    black:   "#4f6a7a"
+    red:     "#ff8a6f"
+    green:   "#8fd9ae"
+    yellow:  "#ffd97f"
+    blue:    "#8fc3e6"
+    magenta: "#cfa7e6"
+    cyan:    "#7fe0d6"
+    white:   "#ffffff"

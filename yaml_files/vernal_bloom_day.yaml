@@ -1,0 +1,29 @@
+# Spring Bloom Day Warp Theme
+# Author: SilentGlasses
+name: Spring Bloom Day
+details: "lighter"
+accent: "#5fbf7a"
+background: "#f1faf4"
+cursor: "#3f8f63"
+foreground: "#20382a"
+selection: "#d9f0e2"
+
+terminal_colors:
+  normal:
+    black:   "#20382a"
+    red:     "#c85f6f"
+    green:   "#5fa87a"
+    yellow:  "#c9b85f"
+    blue:    "#6fa7c9"
+    magenta: "#b07fc9"
+    cyan:    "#5fbfb6"
+    white:   "#e8f5ee"
+  bright:
+    black:   "#4a6a5a"
+    red:     "#e07f8f"
+    green:   "#7fc99a"
+    yellow:  "#e6d97f"
+    blue:    "#8fc3e6"
+    magenta: "#cfa7e6"
+    cyan:    "#7fe0d6"
+    white:   "#ffffff"

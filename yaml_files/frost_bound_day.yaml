@@ -1,0 +1,29 @@
+# Frostbound Day Warp Theme
+# Author: SilentGlasses
+name: Frostbound Day
+details: "lighter"
+accent: "#6faed9"
+background: "#f3f7fb"
+cursor: "#4f7fa8"
+foreground: "#1a2732"
+selection: "#d9e6f2"
+
+terminal_colors:
+  normal:
+    black:   "#1a2732"
+    red:     "#b85f5f"
+    green:   "#6fa89a"
+    yellow:  "#bfae6f"
+    blue:    "#5f93bf"
+    magenta: "#9a7fbf"
+    cyan:    "#6fbfc9"
+    white:   "#edf3f8"
+  bright:
+    black:   "#4a667a"
+    red:     "#d97f7f"
+    green:   "#8fc9bb"
+    yellow:  "#e0cf8f"
+    blue:    "#7fb3e0"
+    magenta: "#bfa7e0"
+    cyan:    "#8fdae6"
+    white:   "#ffffff"

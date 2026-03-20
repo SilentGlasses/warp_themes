@@ -1,0 +1,29 @@
+# Solar Tide Night Warp Theme
+# Author: SilentGlasses
+name: Solar Tide Night
+details: "darker"
+accent: "#ffd166"
+background: "#0e1a22"
+cursor: "#ffe8a3"
+foreground: "#eef6fb"
+selection: "#1f3442"
+
+terminal_colors:
+  normal:
+    black:   "#0e1a22"
+    red:     "#ff7a5c"
+    green:   "#7fd1a1"
+    yellow:  "#ffd166"
+    blue:    "#5fa8d3"
+    magenta: "#c38bd6"
+    cyan:    "#5fd3c6"
+    white:   "#dceaf2"
+  bright:
+    black:   "#1f3442"
+    red:     "#ff9a82"
+    green:   "#9fe6bb"
+    yellow:  "#ffe08a"
+    blue:    "#7fc2e8"
+    magenta: "#ddb3ef"
+    cyan:    "#7ff0e0"
+    white:   "#ffffff"

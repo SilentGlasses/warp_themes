@@ -1,0 +1,32 @@
+# Ride the Puppets Day Warp Theme
+# Author: SilentGlasses
+name: Ride the Puppets Day
+details: "lighter"
+accent: "#2f6fa3"
+background: "#e6eaef"
+cursor: "#1f4f73"
+foreground: "#1e242b"
+selection: "#cfd8e3"
+background_image:
+  path: 'ride_the_puppets_day.png'
+  opacity: 10
+
+terminal_colors:
+  normal:
+    black:   "#1e242b"
+    red:     "#9a3a3a"
+    green:   "#5f8f7f"
+    yellow:  "#bfa35f"
+    blue:    "#2f6fa3"
+    magenta: "#6f5f8f"
+    cyan:    "#4f93a3"
+    white:   "#e6eaef"
+  bright:
+    black:   "#4a5563"
+    red:     "#cc6a6a"
+    green:   "#7fb3a3"
+    yellow:  "#e0c98a"
+    blue:    "#5fa7e0"
+    magenta: "#a88fd4"
+    cyan:    "#7fd4e0"
+    white:   "#ffffff"

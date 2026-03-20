@@ -9,7 +9,7 @@ foreground: "#d6dad7"
 selection: "#1f2b2c"
 background_image:
   path: 'kasumi_night.png'
-  opacity: 20
+  opacity: 10
 
 terminal_colors:
   normal:

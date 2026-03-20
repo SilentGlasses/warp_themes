@@ -9,7 +9,7 @@ foreground: "#e4e8f0"
 selection: "#1a1c2a"
 background_image:
   path: 'covenant_glass_night.png'
-  opacity: 20
+  opacity: 10
 
 terminal_colors:
   normal:

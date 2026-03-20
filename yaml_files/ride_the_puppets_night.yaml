@@ -1,0 +1,32 @@
+# Ride the Puppets Night Warp Theme
+# Author: SilentGlasses
+name: Ride the Puppets Night
+details: "darker"
+accent: "#4fb3ff"
+background: "#0b0d10"
+cursor: "#9fd3ff"
+foreground: "#d8dbe0"
+selection: "#1c2633"
+background_image:
+  path: 'ride_the_puppets_night.png'
+  opacity: 10
+
+terminal_colors:
+  normal:
+    black:   "#0b0d10"
+    red:     "#7c2d2d"
+    green:   "#4f6f5f"
+    yellow:  "#9a7c3c"
+    blue:    "#2f6fa3"
+    magenta: "#5a4a6f"
+    cyan:    "#3f8fa3"
+    white:   "#bfc5cc"
+  bright:
+    black:   "#2a2f36"
+    red:     "#b84a4a"
+    green:   "#6fa38f"
+    yellow:  "#d4b26a"
+    blue:    "#5fa7e0"
+    magenta: "#8f7fb3"
+    cyan:    "#7fd4e0"
+    white:   "#ffffff"

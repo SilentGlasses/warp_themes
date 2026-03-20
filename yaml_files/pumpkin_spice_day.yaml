@@ -1,0 +1,29 @@
+# Pumpkin Spice Ember Day Warp Theme
+# Author: SilentGlasses
+name: Pumpkin Spice Ember Day
+details: "lighter"
+accent: "#e8701f"
+background: "#f8efe6"
+cursor: "#c85a18"
+foreground: "#3b1f12"
+selection: "#f0d6bf"
+
+terminal_colors:
+  normal:
+    black:   "#3b1f12"
+    red:     "#a9441c"
+    green:   "#8a4a24"
+    yellow:  "#c4682e"
+    blue:    "#9f5a2e"
+    magenta: "#7a3f20"
+    cyan:    "#cf7a3a"
+    white:   "#f2e4d8"
+  bright:
+    black:   "#6a3a22"
+    red:     "#d06034"
+    green:   "#b36a3a"
+    yellow:  "#ff9f4a"
+    blue:    "#c97a46"
+    magenta: "#a85a30"
+    cyan:    "#ffb878"
+    white:   "#ffffff"
