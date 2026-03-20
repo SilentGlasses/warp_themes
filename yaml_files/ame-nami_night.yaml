@@ -1,0 +1,32 @@
+# Ame-Nami Night Warp Theme
+# Author: SilentGlasses
+name: Ame-Nami Night
+details: "darker"
+accent: "#3f8f9f"
+background: "#0c1418"
+cursor: "#6fa3b3"
+foreground: "#dbe4e1"
+selection: "#16262e"
+background_image:
+  path: 'ame-nami_night.png'
+  opacity: 10
+
+terminal_colors:
+  normal:
+    black:   "#0c1418"
+    red:     "#a13f3f"
+    green:   "#4f7f6f"
+    yellow:  "#b38f3f"
+    blue:    "#1f5f8f"
+    magenta: "#6f4f7f"
+    cyan:    "#3f8f9f"
+    white:   "#cfdad7"
+  bright:
+    black:   "#18242a"
+    red:     "#c75a5a"
+    green:   "#6fa59a"
+    yellow:  "#d6b96a"
+    blue:    "#4f93c7"
+    magenta: "#9f73bf"
+    cyan:    "#6fc7d3"
+    white:   "#f3f7f6"

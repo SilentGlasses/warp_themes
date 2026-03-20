@@ -54,11 +54,38 @@ retry_curl() {
         if [[ $attempt -lt $max_attempts ]]; then
             echo -e "${YELLOW}Attempt $attempt failed, retrying in ${wait_time}s...${NC}"
             sleep $wait_time
-            wait_time=$((wait_time * 2))  # Exponential backoff
+            wait_time=$((wait_time * 2))
         fi
         ((attempt++))
     done
     return 1
+}
+
+# Function to extract background image path from a theme YAML file.
+# Scans all lines for "path:" following a "background_image:" block,
+# handling arbitrary indentation and whitespace robustly.
+extract_bg_image() {
+    local file="$1"
+    local in_bg_block=0
+    local bg_path=""
+    while IFS= read -r line; do
+        if echo "$line" | grep -q "background_image:"; then
+            in_bg_block=1
+            continue
+        fi
+        if [[ $in_bg_block -eq 1 ]]; then
+            # A new top-level key (no leading whitespace) ends the block
+            if echo "$line" | grep -qE "^[^[:space:]]"; then
+                break
+            fi
+            if echo "$line" | grep -q "path:"; then
+                bg_path=$(echo "$line" | sed "s/.*path:[[:space:]]*['\"]\\?//" | sed "s/['\"].*//")
+                bg_path=$(echo "$bg_path" | tr -d '[:space:]')
+                break
+            fi
+        fi
+    done < "$file"
+    echo "$bg_path"
 }
 
 # GitHub repository details
@@ -83,10 +110,8 @@ echo -e "${YELLOW}[3]${NC} Install for both versions"
 echo -e "${YELLOW}[Q]${NC} Quit"
 echo -e "${YELLOW}-----------------------------------------${NC}"
 
-# Get version selection
 read -p "Select version (1-3 or Q to quit): " -r version_selection
 
-# Process version selection
 case $version_selection in
   1)
     install_dirs=("$WARP_THEMES_DIR")
@@ -130,32 +155,34 @@ if ! retry_curl "$API_URL" "$api_response_file"; then
   exit 1
 fi
 
-# Parse theme files from API response
-theme_files=$(sed -n 's/.*"name": "\([^"]*\.yaml\)".*/\1/p' "$api_response_file" | sed 's/\.yaml$//')
-
-# Clean up temporary file
+# Parse theme files from API response into an indexed array (handles filenames safely)
+mapfile -t theme_files_raw < <(sed -n 's/.*"name": "\([^"]*\.yaml\)".*/\1/p' "$api_response_file" | sed 's/\.yaml$//')
 rm -f "$api_response_file"
 
-if [[ -z "$theme_files" ]]; then
+if [[ ${#theme_files_raw[@]} -eq 0 ]]; then
   echo -e "${RED}No theme files found in the repository.${NC}"
   exit 1
 fi
 
 # Fetch theme names from their YAML content
+# Declare tracking arrays before any function that writes to them
 declare -A themes
 declare -A file_map
+declare -A installed_themes
+declare -A existing_themes
+declare -A failed_themes
+declare -A background_status
 index=1
 
-for file in $theme_files; do
-  # Strip any trailing whitespace/newlines from the filename
+for file in "${theme_files_raw[@]}"; do
   file=$(echo "$file" | tr -d '\r\n')
+  [[ -z "$file" ]] && continue
+
   yaml_url="$RAW_BASE/$file.yaml"
   temp_yaml="/tmp/warp_theme_${file}.yaml"
   theme_name=""
 
-  # Download theme YAML with retry logic
   if retry_curl "$yaml_url" "$temp_yaml"; then
-    # Validate the downloaded theme file
     if validate_theme_file "$temp_yaml"; then
       theme_name=$(grep "^name:" "$temp_yaml" | sed 's/^name: *//' | tr -d '"\047')
     else
@@ -168,13 +195,13 @@ for file in $theme_files; do
     continue
   fi
 
-  # Clean up temporary file
   rm -f "$temp_yaml"
 
   if [[ -z "$theme_name" ]]; then
-    theme_name="$file"  # Fallback to filename if name field is missing
+    theme_name="$file"
   fi
 
+  # Use a safe separator that won't appear in theme names or version strings
   themes["$index"]="$theme_name"
   file_map["$index"]="$file.yaml"
   ((index++))
@@ -185,11 +212,10 @@ if [[ ${#themes[@]} -eq 0 ]]; then
   exit 1
 fi
 
-# Pretty display of theme menu (with corrected order)
+# Display theme menu
 echo -e "\n${BOLD}${BLUE}Available Warp Themes:${NC}"
 echo -e "${YELLOW}-----------------------------------------${NC}"
 
-# Display themes with proper indexing
 max_index=${#themes[@]}
 for ((i=1; i<=max_index; i++)); do
   if [[ -n "${themes[$i]}" ]]; then
@@ -201,7 +227,6 @@ echo -e "${YELLOW}[A]${NC} Install all themes"
 echo -e "${YELLOW}[Q]${NC} Quit"
 echo -e "${YELLOW}-----------------------------------------${NC}"
 
-# Prompt the user for selection
 echo ""
 read -p "Select themes to install (e.g., 1 3 5 or A for all): " -r selection
 
@@ -215,16 +240,20 @@ get_version_name() {
   fi
 }
 
-# Function to download and install a theme
+# Function to download and install a theme.
+# Uses index-based install_key to avoid any separator collision with theme names.
 install_theme() {
   local theme_name=$1
   local theme_file=$2
   local install_dir=$3
-  local version_name=$(get_version_name "$install_dir")
+  local theme_index=$4
+  local version_name
+  version_name=$(get_version_name "$install_dir")
   local url="$RAW_BASE/$theme_file"
   local destination="$install_dir/$theme_file"
   local background_installed=""
-  local install_key="${theme_name}::${version_name}"
+  # Key uses numeric index + version to guarantee uniqueness and avoid name collisions
+  local install_key="${theme_index}::${version_name}"
 
   if [[ -f "$destination" ]]; then
     existing_themes["$install_key"]="$theme_name in $version_name"
@@ -233,14 +262,12 @@ install_theme() {
 
   echo -e "${BLUE}Installing $theme_name to $version_name...${NC}"
 
-  # Download theme with retry logic
   if ! retry_curl "$url" "$destination"; then
     echo -e "${RED}Failed to download theme $theme_name after multiple attempts.${NC}"
     failed_themes["$install_key"]="$theme_name in $version_name"
     return 1
   fi
 
-  # Validate the downloaded theme file
   if ! validate_theme_file "$destination"; then
     echo -e "${RED}Downloaded theme file is invalid: $theme_name${NC}"
     rm -f "$destination"
@@ -248,10 +275,11 @@ install_theme() {
     return 1
   fi
 
-  # Check if the theme has a background image and download it
-  local bg_image=$(grep -A1 "background_image:" "$destination" | grep "path:" | sed "s/.*path: *['\"]\(.*\)['\"].*/\1/" | head -1)
+  # Robustly extract background image path (handles varied indentation)
+  local bg_image
+  bg_image=$(extract_bg_image "$destination")
 
-  if [[ ! -z "$bg_image" ]]; then
+  if [[ -n "$bg_image" ]]; then
     local bg_url="$BACKGROUNDS_BASE/$bg_image"
     local bg_destination="$install_dir/$bg_image"
 
@@ -270,33 +298,25 @@ install_theme() {
   return 0
 }
 
-# Arrays to track installation outcomes
-declare -A installed_themes
-declare -A existing_themes
-declare -A failed_themes
-declare -A background_status
-
 # Process the user's selection
 if [[ "$selection" =~ ^[Aa]$ ]]; then
-  # Install all themes to selected directories
   for dir in "${install_dirs[@]}"; do
     version_name=$(get_version_name "$dir")
     echo -e "\n${BLUE}Installing themes for $version_name...${NC}"
     for i in "${!themes[@]}"; do
-      install_theme "${themes[$i]}" "${file_map[$i]}" "$dir"
+      install_theme "${themes[$i]}" "${file_map[$i]}" "$dir" "$i"
     done
   done
 elif [[ "$selection" =~ ^[Qq]$ ]]; then
   echo "Installation canceled."
   exit 0
 else
-  # Install selected themes to selected directories
   for dir in "${install_dirs[@]}"; do
     version_name=$(get_version_name "$dir")
     echo -e "\n${BLUE}Installing selected themes for $version_name...${NC}"
     for index in $selection; do
       if [[ -n "${themes[$index]}" ]]; then
-        install_theme "${themes[$index]}" "${file_map[$index]}" "$dir"
+        install_theme "${themes[$index]}" "${file_map[$index]}" "$dir" "$index"
       else
         echo -e "${RED}Invalid selection: $index${NC}"
       fi
@@ -309,52 +329,44 @@ echo -e "\n${BLUE}Installation Summary:${NC}"
 if [[ ${#installed_themes[@]} -gt 0 ]]; then
   echo -e "${GREEN}✓ Installed themes:${NC}"
 
-  # Create arrays for each version
   declare -a warp_installed=()
   declare -a preview_installed=()
 
-  # Sort themes into version-specific arrays with their background status
   for key in "${!installed_themes[@]}"; do
     theme_info="${installed_themes[$key]}"
-    bg_status="${background_status[$key]}"
+    bg_stat="${background_status[$key]}"
 
-    # Create the display string with background info
-    if [[ "$bg_status" == "installed" ]]; then
+    if [[ "$bg_stat" == "installed" ]]; then
       display=" (with background image)"
-    elif [[ "$bg_status" == "exists" ]]; then
+    elif [[ "$bg_stat" == "exists" ]]; then
       display=" (background image already exists)"
-    elif [[ "$bg_status" == "failed" ]]; then
+    elif [[ "$bg_stat" == "failed" ]]; then
       display=" (background image not found)"
     else
       display=""
     fi
 
     if [[ "$theme_info" == *"in Warp Preview"* ]]; then
-      # Strip "in Warp Preview" and add to preview array
       clean_name="${theme_info% in Warp Preview}$display"
       preview_installed+=("$clean_name")
     else
-      # Strip "in Warp" and add to warp array
       clean_name="${theme_info% in Warp}$display"
       warp_installed+=("$clean_name")
     fi
   done
 
-  # Sort the arrays
   IFS=$'\n' sorted_warp_installed=($(sort <<<"${warp_installed[*]}"))
   IFS=$'\n' sorted_preview_installed=($(sort <<<"${preview_installed[*]}"))
   unset IFS
 
-  # Display Warp themes if any exist
-  if [ ${#sorted_warp_installed[@]} -gt 0 ]; then
+  if [[ ${#sorted_warp_installed[@]} -gt 0 ]]; then
     echo -e "  ${BLUE}Warp:${NC}"
     for theme in "${sorted_warp_installed[@]}"; do
       echo "    - $theme"
     done
   fi
 
-  # Display Warp Preview themes if any exist
-  if [ ${#sorted_preview_installed[@]} -gt 0 ]; then
+  if [[ ${#sorted_preview_installed[@]} -gt 0 ]]; then
     echo -e "  ${BLUE}Warp Preview:${NC}"
     for theme in "${sorted_preview_installed[@]}"; do
       echo "    - $theme"
@@ -363,48 +375,39 @@ if [[ ${#installed_themes[@]} -gt 0 ]]; then
 fi
 
 if [[ ${#existing_themes[@]} -gt 0 ]]; then
-  # Count how many themes should be installed in total
   total_expected=$((${#themes[@]} * ${#install_dirs[@]}))
 
-  # If everything is already installed, show a simpler message
   if [[ ${#existing_themes[@]} -eq $total_expected && ${#installed_themes[@]} -eq 0 && ${#failed_themes[@]} -eq 0 ]]; then
     echo -e "${YELLOW}• All themes are already installed in selected version(s)${NC}"
   else
     echo -e "${YELLOW}• Already installed themes:${NC}"
 
-    # Create arrays for each version
     declare -a warp_themes=()
     declare -a preview_themes=()
 
-    # Sort themes into version-specific arrays
     for key in "${!existing_themes[@]}"; do
       theme_info="${existing_themes[$key]}"
       if [[ "$theme_info" == *"in Warp Preview"* ]]; then
-        # Strip "in Warp Preview" and add to preview array
         clean_name="${theme_info% in Warp Preview}"
         preview_themes+=("$clean_name")
       else
-        # Strip "in Warp" and add to warp array
         clean_name="${theme_info% in Warp}"
         warp_themes+=("$clean_name")
       fi
     done
 
-    # Sort the arrays
     IFS=$'\n' sorted_warp=($(sort <<<"${warp_themes[*]}"))
     IFS=$'\n' sorted_preview=($(sort <<<"${preview_themes[*]}"))
     unset IFS
 
-    # Display Warp themes if any exist
-    if [ ${#sorted_warp[@]} -gt 0 ]; then
+    if [[ ${#sorted_warp[@]} -gt 0 ]]; then
       echo -e "  ${BLUE}Warp:${NC}"
       for theme in "${sorted_warp[@]}"; do
         echo "    - $theme"
       done
     fi
 
-    # Display Warp Preview themes if any exist
-    if [ ${#sorted_preview[@]} -gt 0 ]; then
+    if [[ ${#sorted_preview[@]} -gt 0 ]]; then
       echo -e "  ${BLUE}Warp Preview:${NC}"
       for theme in "${sorted_preview[@]}"; do
         echo "    - $theme"
@@ -416,39 +419,32 @@ fi
 if [[ ${#failed_themes[@]} -gt 0 ]]; then
   echo -e "${RED}✗ Failed installations:${NC}"
 
-  # Create arrays for each version
   declare -a warp_failed=()
   declare -a preview_failed=()
 
-  # Sort themes into version-specific arrays
   for key in "${!failed_themes[@]}"; do
     theme_info="${failed_themes[$key]}"
     if [[ "$theme_info" == *"in Warp Preview"* ]]; then
-      # Strip "in Warp Preview" and add to preview array
       clean_name="${theme_info% in Warp Preview}"
       preview_failed+=("$clean_name")
     else
-      # Strip "in Warp" and add to warp array
       clean_name="${theme_info% in Warp}"
       warp_failed+=("$clean_name")
     fi
   done
 
-  # Sort the arrays
   IFS=$'\n' sorted_warp_failed=($(sort <<<"${warp_failed[*]}"))
   IFS=$'\n' sorted_preview_failed=($(sort <<<"${preview_failed[*]}"))
   unset IFS
 
-  # Display Warp themes if any exist
-  if [ ${#sorted_warp_failed[@]} -gt 0 ]; then
+  if [[ ${#sorted_warp_failed[@]} -gt 0 ]]; then
     echo -e "  ${BLUE}Warp:${NC}"
     for theme in "${sorted_warp_failed[@]}"; do
       echo "    - $theme"
     done
   fi
 
-  # Display Warp Preview themes if any exist
-  if [ ${#sorted_preview_failed[@]} -gt 0 ]; then
+  if [[ ${#sorted_preview_failed[@]} -gt 0 ]]; then
     echo -e "  ${BLUE}Warp Preview:${NC}"
     for theme in "${sorted_preview_failed[@]}"; do
       echo "    - $theme"

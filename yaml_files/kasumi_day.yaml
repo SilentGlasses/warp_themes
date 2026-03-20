@@ -1,0 +1,32 @@
+# Kasumi Day Warp Theme
+# Author: SilentGlasses
+name: Kasumi Day
+details: "lighter"
+accent: "#6f9a9a"
+background: "#f2f4f1"
+cursor: "#4f7f7a"
+foreground: "#2d3434"
+selection: "#dde6e3"
+background_image:
+  path: 'kasumi_day.png'
+  opacity: 10
+
+terminal_colors:
+  normal:
+    black:   "#2d3434"
+    red:     "#9a4a4a"
+    green:   "#6f8f87"
+    yellow:  "#b3a35f"
+    blue:    "#4f738a"
+    magenta: "#7a688f"
+    cyan:    "#6f9a9a"
+    white:   "#e6e9e5"
+  bright:
+    black:   "#4a5454"
+    red:     "#c06a6a"
+    green:   "#8fb3aa"
+    yellow:  "#d4c57f"
+    blue:    "#6f9fc2"
+    magenta: "#a48bc2"
+    cyan:    "#8fcfc7"
+    white:   "#ffffff"

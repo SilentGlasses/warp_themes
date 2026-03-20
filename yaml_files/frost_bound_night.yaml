@@ -1,0 +1,29 @@
+# Frostbound Night Warp Theme
+# Author: SilentGlasses
+name: Frostbound Night
+details: "darker"
+accent: "#9fd3ff"
+background: "#0b1116"
+cursor: "#d6ecff"
+foreground: "#eef4f9"
+selection: "#1a2732"
+
+terminal_colors:
+  normal:
+    black:   "#0b1116"
+    red:     "#c46a6a"
+    green:   "#7fb3a3"
+    yellow:  "#c9b87f"
+    blue:    "#6fa7d9"
+    magenta: "#a88fd4"
+    cyan:    "#7fcfd9"
+    white:   "#dce6ee"
+  bright:
+    black:   "#1a2732"
+    red:     "#e08a8a"
+    green:   "#9fd0c0"
+    yellow:  "#e6d79f"
+    blue:    "#8fc3f0"
+    magenta: "#c0a7e6"
+    cyan:    "#9fe6f0"
+    white:   "#ffffff"

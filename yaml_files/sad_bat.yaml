@@ -4,7 +4,7 @@ name: Sad Bat
 details: "darker"
 accent: "#F8F805"
 background: "#2A2C2E"
-foreground: "#4A5575
+foreground: "#4A5575"
 
 terminal_colors:
   bright:
