@@ -89,9 +89,21 @@ I use the following on both my mac and Linux machines:
 
 Some themes include background images that will be automatically installed by the script. The installer checks for the `background_image.path` field in each theme YAML file and downloads the corresponding image from the repository's backgrounds directory.
 
+## Ame-Nami Day
+
+<img src="./screenshots/ame-nami_day.png" alt="Ame-Nami Day" width="850">
+
+## Ame-Nami Night
+
+<img src="./screenshots/ame-nami_night.png" alt="Ame-Nami Night" width="850">
+
 ## Covenant Glass Night
 
 <img src="./screenshots/covenant_glass_night.png" alt="Covenant Glass Night" width="850">
+
+### Dark Knight
+
+<img src="./screenshots/dark_knight.png" alt="Dark Knight" width="850">
 
 ### Ethereal Galaxy Dark
 
@@ -100,6 +112,18 @@ Some themes include background images that will be automatically installed by th
 ## Flood Contagion
 
 <img src="./screenshots/flood_contagion.png" alt="Flood Contagion" width="850">
+
+## Hallownest Veil Day
+
+<img src="./screenshots/hallownest_veil_day.png" alt="Hallownest Veil Day" width="850">
+
+## Hallownest Veil Night
+
+<img src="./screenshots/hallownest_veil_night.png" alt="Hallownest Veil Night" width="850">
+
+## Kasumi Day
+
+<img src="./screenshots/kasumi_day.png" alt="Kasumi Day" width="850">
 
 ## Kasumi Night
 
@@ -126,6 +150,10 @@ Some themes include background images that will be automatically installed by th
 ### Strand Dark
 
 <img src="./screenshots/strand_dark.png" alt="Strand Dark" width="850">
+
+## Ukiyo Day
+
+<img src="./screenshots/ukiyo_day.png" alt="Ukiyo Day" width="850">
 
 ## Ukiyo Night
 
