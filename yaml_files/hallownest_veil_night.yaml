@@ -1,0 +1,34 @@
+# Author: SilentGlasses
+# Hallownest Veil Night
+
+name: Hallownest Veil Night
+details: "darker"
+accent: "#9e6c2f"
+background: "#1f1c18"
+cursor: "#c9b1b1"
+foreground: "#d0c9b2"
+selection: "#34302b"
+
+background_image:
+  path: 'hallownest_veil_night.png'
+  opacity: 10
+
+terminal_colors:
+  normal:
+    black:   "#1f1c18"
+    red:     "#9e4e3b"
+    green:   "#6b7459"
+    yellow:  "#a08c4e"
+    blue:    "#4a5a5c"
+    magenta: "#8b6c74"
+    cyan:    "#7c8474"
+    white:   "#d0c9b2"
+  bright:
+    black:   "#2a2924"
+    red:     "#bb6b53"
+    green:   "#7f8d66"
+    yellow:  "#b0a065"
+    blue:    "#5f7175"
+    magenta: "#9f7e89"
+    cyan:    "#88a087"
+    white:   "#f2f1e8"
