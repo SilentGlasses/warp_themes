@@ -5,6 +5,9 @@ details: "lighter"
 accent: "#3a6f7a"
 background: "#f4f1ea"
 foreground: "#2a2f2e"
+background_image:
+  path: 'ukiyo_day.png'
+  opacity: 50
 
 terminal_colors:
   normal:
