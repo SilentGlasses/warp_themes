@@ -78,7 +78,7 @@ extract_bg_image() {
                 break
             fi
             if echo "$line" | grep -q "path:"; then
-                bg_path=$(echo "$line" | sed "s/.*path:[[:space:]]*['\"]\\?//" | sed "s/['\"].*//" | tr -d '[:space:]')
+                bg_path=$(echo "$line" | sed -E "s/.*path:[[:space:]]*['\"]?//" | sed -E "s/['\"].*//" | tr -d '[:space:]')
                 break
             fi
         fi
