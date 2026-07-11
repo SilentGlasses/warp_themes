@@ -7,10 +7,6 @@ accent: "#d26937"
 background: "#0c1014"
 foreground: "#99d1ce"
 
-background_image:
-  path: 'dark_knight.png'
-  opacity: 20
-
 terminal_colors:
   bright:
     black: "#091f2e"
