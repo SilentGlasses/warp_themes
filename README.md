@@ -6,10 +6,9 @@ If you want to get Warp, download it from [here](https://app.warp.dev/referral/2
 
 This project includes easy-to-use scripts that automates the installation of Warp themes from this repository. The script fetches available theme files directly from the repository and installs them to the correct location on your system based on your operating system.
 
->[!NOTE]
-> - **The Liquid Glass themes only works on MacOS**
-> - They call for a background but there is none. This is the only way I could get the right background transparency effect.
-> - **PLEASE** disregard the `Could not download background image` warning if it shows up.
+>[!CAUTION]
+> - **The Liquid Glass themes only works properly on MacOS**
+> - They cause transparency issues on other operating systems.
 
 ## Features:
 
@@ -39,10 +38,6 @@ bash <(curl -s https://raw.githubusercontent.com/SilentGlasses/warp_themes/main/
 ```
 
 ### For Windows
-
-> [!NOTE]
-> The Windows Installer should work now, please open an issue if you encounter any problems.
-> Thanks for your understanding and patience.
 
 > [!IMPORTANT]
 > Execution policies are not a security boundary to restrict users; they are meant to prevent accidental script execution.
@@ -132,14 +127,14 @@ Some themes include background images that will be automatically installed by th
 ### Liquid Glass Dark
 
 >[!NOTE]
-> **This theme only works well on MacOS**. It calls for a background but there is none. This is the only way I could get the right background transparency effect.
+> **This theme only works well on MacOS**.
 
 <img src="./screenshots/liquid_glass_dark.png" alt="Liquid Glass Dark" width="850">
 
 ### Liquid Glass Light
 
 >[!NOTE]
-> **This theme only works well on MacOS**. It calls for a background but there is none. This is the only way I could get the right background transparency effect.
+> **This theme only works well on MacOS**.
 
 <img src="./screenshots/liquid_glass_light.png" alt="Liquid Glass Light" width="850">
 

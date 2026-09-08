@@ -25,6 +25,14 @@ if ! command -v curl > /dev/null; then
     exit 1
 fi
 
+# Create a private, unpredictable temp directory for scratch downloads
+# (avoids symlink/race attacks on fixed /tmp filenames) and clean it up on exit
+WORK_DIR=$(mktemp -d "${TMPDIR:-/tmp}/warp_theme_installer.XXXXXX") || {
+    echo -e "${RED}Error: Failed to create temporary working directory.${NC}"
+    exit 1
+}
+trap 'rm -rf "$WORK_DIR"' EXIT
+
 # Function to validate theme file
 validate_theme_file() {
     local file="$1"
@@ -35,6 +43,16 @@ validate_theme_file() {
         echo -e "${YELLOW}Warning: Invalid theme file format in $file${NC}"
         return 1
     fi
+    return 0
+}
+
+# Function to reject paths that could escape the install directory
+# (path traversal via "..", absolute paths, or empty values)
+is_safe_relative_path() {
+    local path="$1"
+    [[ -z "$path" ]] && return 1
+    [[ "$path" == /* ]] && return 1
+    [[ "$path" == *..* ]] && return 1
     return 0
 }
 
@@ -78,7 +96,7 @@ extract_bg_image() {
                 break
             fi
             if echo "$line" | grep -q "path:"; then
-                bg_path=$(echo "$line" | sed "s/.*path:[[:space:]]*['\"]\\?//" | sed "s/['\"].*//" | tr -d '[:space:]')
+                bg_path=$(echo "$line" | sed -E "s/.*path:[[:space:]]*['\"]?//" | sed "s/['\"].*//" | tr -d '[:space:]')
                 break
             fi
         fi
@@ -145,7 +163,7 @@ echo -e "${BOLD}${BLUE}Installing themes for ${version_name}...${NC}"
 echo -e "${BOLD}${BLUE}Fetching available themes...${NC}"
 
 # Fetch the list of theme files from GitHub
-api_response_file="/tmp/warp_api_response.json"
+api_response_file="$WORK_DIR/warp_api_response.json"
 if ! retry_curl "$API_URL" "$api_response_file"; then
   echo -e "${RED}Failed to retrieve theme list after multiple attempts.${NC}"
   echo -e "${YELLOW}Please check your internet connection or GitHub API limits.${NC}"
@@ -177,7 +195,7 @@ for file in "${theme_files_raw[@]}"; do
   [[ -z "$file" ]] && continue
 
   yaml_url="$RAW_BASE/$file.yaml"
-  temp_yaml="/tmp/warp_theme_${file}.yaml"
+  temp_yaml="$WORK_DIR/theme_${file}.yaml"
   theme_name=""
 
   if retry_curl "$yaml_url" "$temp_yaml"; then
@@ -269,6 +287,11 @@ install_theme() {
   # Robustly extract background image path
   local bg_image
   bg_image=$(extract_bg_image "$destination")
+
+  if [[ -n "$bg_image" ]] && ! is_safe_relative_path "$bg_image"; then
+    echo -e "${YELLOW}Warning: Skipping unsafe background image path for $theme_name: $bg_image${NC}"
+    bg_image=""
+  fi
 
   if [[ -n "$bg_image" ]]; then
     local bg_url="$BACKGROUNDS_BASE/$bg_image"
